@@ -2,8 +2,8 @@
 layout: default
 ---
 <nav>
-	{% if page.previous %}<a href="{{ site.baseurl }}{{ page.previous.url }}">&larr; previous</a>{% endif %}
-	{% if page.next %}<a href="{{ site.baseurl }}{{ page.next.url }}">next &rarr;</a>{% endif %}
+	{% if page.previous %}<a href="{{ page.previous.url }}">&larr; previous</a>{% endif %}
+	{% if page.next %}<a href="{{ page.next.url }}">next &rarr;</a>{% endif %}
 </nav>
 
 <div id="post">
