@@ -1,0 +1,20 @@
+---
+layout: default
+---
+<nav>
+	{% if page.previous %}<a href="{{ site.baseurl }}{{ page.previous.url }}">&larr; previous</a>{% endif %}
+	{% if page.next %}<a href="{{ site.baseurl }}{{ page.next.url }}">next &rarr;</a>{% endif %}
+</nav>
+
+<div id="post">
+{{ content }}
+</div>
+
+<div id="related">
+  <h2>Related Posts</h2>
+  <ul class="posts">
+    {% for post in site.related_posts limit:3 %}
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
