@@ -33,6 +33,7 @@ title: 根据IP记录Linux用户SSH登陆终端操作历史命令
 
 
 相关参考资料:
-+ [http://www.ha97.com/4733.html](http://www.ha97.com/4733.html)
-+ [http://blog.csdn.net/sunboy_2050/article/details/6322892](http://blog.csdn.net/sunboy_2050/article/details/6322892)
-+ [http://www.linuxquestions.org/questions/linux-general-1/etc-profile-v-s-etc-bashrc-273992/](http://www.linuxquestions.org/questions/linux-general-1/etc-profile-v-s-etc-bashrc-273992/)
+
++ <http://www.ha97.com/4733.html>
++ <http://blog.csdn.net/sunboy_2050/article/details/6322892>
++ <http://www.linuxquestions.org/questions/linux-general-1/etc-profile-v-s-etc-bashrc-273992/>
