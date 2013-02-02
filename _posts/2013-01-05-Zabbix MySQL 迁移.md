@@ -1,29 +1,29 @@
 ---
 layout: post
-title: Zabbix MySQL Ç¨ÒÆ
+title: Zabbix MySQL è¿ç§»
 ---
 
-Zabbix MySQL Ç¨ÒÆ
+Zabbix MySQL è¿ç§»
 ========================
 05 Jan 2013 - Beijing 
  
-µ¼³ö±¾µØÊı¾İ²¢¹Ø±ÕÊı¾İ¿â£º
+å¯¼å‡ºæœ¬åœ°æ•°æ®å¹¶å…³é—­æ•°æ®åº“ï¼š
 	mysqldump -u root -p password > /tmp/zabbix_db_dump
 	service mysql stop
-ÔÚĞÂ»úÆ÷ÉÏ´´½¨Êı¾İ¿â²¢µ¼Èë£º
+åœ¨æ–°æœºå™¨ä¸Šåˆ›å»ºæ•°æ®åº“å¹¶å¯¼å…¥ï¼š
 	Create database zabbix;
 	mysql -u root -p password < /tmp/zabbix_db_dump
 	mysql -u root -p password
-´´½¨zabbixÓÃ»§:
-	create user ¡®zabbix¡¯@'IP Address¡¯ identified by ¡®Password¡¯;
+åˆ›å»ºzabbixç”¨æˆ·:
+	create user â€˜zabbixâ€™@'IP Addressâ€™ identified by â€˜Passwordâ€™;
 	use zabbix;
-	grant all privileges on zabbix.* to ¡®zabbix¡¯@'IP Address¡¯;
+	grant all privileges on zabbix.* to â€˜zabbixâ€™@'IP Addressâ€™;
 	flush privileges;
 	exit;
-×¢: IP Address ¿ÉÑ¡ÔñÊ¹ÓÃ'%.%.%.%'Ä£Ê½¡£
+æ³¨: IP Address å¯é€‰æ‹©ä½¿ç”¨'%.%.%.%'æ¨¡å¼ã€‚
 	mysql -u zabbix -p -h MySQLServerIPAddress
 	
-ÅäÖÃzabbix·şÎñ£º
+é…ç½®zabbixæœåŠ¡ï¼š
 First, stop Zabbix Agent and Server.
 	sudo /etc/init.d/zabbix-agent stop
 	sudo /etc/init.d/zabbix-server stop
@@ -31,10 +31,10 @@ Edit the following file: /etc/zabbix/zabbix_server.conf.Search for DBHost.
 Update the line to:
 	DBHost=IP Address
 	DBPassword=Password
-ÖØÆôzabbix·şÎñ
+é‡å¯zabbixæœåŠ¡
 	sudo /etc/init.d/zabbix-server start
 	sudo /etc/init.d/zabbix-agent start
-ÅäÖÃzabbixÇ°¶Ë£º
+é…ç½®zabbixå‰ç«¯ï¼š
 Edit the following file: /zabbix/conf/zabbix.conf.php. 
 Search for $DB["SERVER"] and change the ip address to IP Address.
 	$DB['SERVER'] = 'IP Address';
