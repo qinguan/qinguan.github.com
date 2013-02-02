@@ -7,8 +7,8 @@ OpenLDAP Replication
 ========================
 05 Jan 2013 - Beijing
 
-mirror·½Ê½£¬¸ÃÄ£Ê½²»Ö§³Ö¶ÔÁ½Ì¨LDAP·şÎñÆ÷Í¬Ê±Ğ´²Ù×÷¡£
-±à¼­/etc/openldap/slapd.conf,Ìí¼ÓÈçÏÂ:
+mirroræ–¹å¼ï¼Œè¯¥æ¨¡å¼ä¸æ”¯æŒå¯¹ä¸¤å°LDAPæœåŠ¡å™¨åŒæ—¶å†™æ“ä½œã€‚
+ç¼–è¾‘/etc/openldap/slapd.conf,æ·»åŠ å¦‚ä¸‹:
 	serverID        1
 	moduleload syncprov.la
 	 
@@ -27,12 +27,12 @@ mirror·½Ê½£¬¸ÃÄ£Ê½²»Ö§³Ö¶ÔÁ½Ì¨LDAP·şÎñÆ÷Í¬Ê±Ğ´²Ù×÷¡£
 					starttls=yes
 					tls_cacert=/etc/openldap/cacerts/cacert.pem
 	mirrormode on
-ÖØÆôldap server£º
+é‡å¯ldap serverï¼š
 	service slapd restart
 
-×¢£ºÁíÍâÒ»Ì¨Openldap ServerÅäÖÃÀ×Í¬£¬µ«ĞèÒªĞŞ¸ÄserverID£¬ÒÔ¼°provider.
-Á½Ì¨ServerÊ¹ÓÃÁËÍ¬ÑùµÄCAÇ©Ãû£¬Õë¶Ô²»Í¬µÄhostnameĞŞ¸ÄÁËÖ¤ÊéµÄCN.
+æ³¨ï¼šå¦å¤–ä¸€å°Openldap Serveré…ç½®é›·åŒï¼Œä½†éœ€è¦ä¿®æ”¹serverIDï¼Œä»¥åŠprovider.
+ä¸¤å°Serverä½¿ç”¨äº†åŒæ ·çš„CAç­¾åï¼Œé’ˆå¯¹ä¸åŒçš„hostnameä¿®æ”¹äº†è¯ä¹¦çš„CN.
 
-Ïà¹Ø²Î¿¼×ÊÁÏ£º
+ç›¸å…³å‚è€ƒèµ„æ–™ï¼š
 
 + <http://www.openldap.org/doc/admin24/replication.html>
