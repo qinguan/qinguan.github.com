@@ -1,19 +1,19 @@
 ---
 layout: post
-title: MySQL innodb_buffer_pool_size²ÎÊý
+title: MySQL innodb_buffer_pool_sizeå‚æ•°
 ---
 
-MySQL innodb_buffer_pool_size²ÎÊý
+MySQL innodb_buffer_pool_sizeå‚æ•°
 ========================
 04 Jan 2013 - Beijing
 
-¸Ã²ÎÊý¶¨ÒåÁË InnoDB ´æ´¢ÒýÇæµÄ±íÊý¾ÝºÍË÷ÒýÊý¾ÝµÄ×î´óÄÚ´æ»º³åÇø´óÐ¡,ÊÊµ±µÄÔö¼ÓÕâ¸ö²ÎÊýµÄ´óÐ¡£¬¿ÉÒÔÓÐÐ§µÄ¼õÉÙ InnoDBÀàÐÍµÄ±íµÄ´ÅÅÌ I/O ¡£ÔÚÒ»¸öÒÔ InnoDBÎªÖ÷µÄ×¨ÓÃÊý¾Ý¿â·þÎñÆ÷ÉÏ£¬¿ÉÒÔ¿¼ÂÇ°Ñ¸Ã²ÎÊýÉèÖÃÎªÎïÀíÄÚ´æ´óÐ¡µÄ60%-80%¡£
+è¯¥å‚æ•°å®šä¹‰äº† InnoDB å­˜å‚¨å¼•æ“Žçš„è¡¨æ•°æ®å’Œç´¢å¼•æ•°æ®çš„æœ€å¤§å†…å­˜ç¼“å†²åŒºå¤§å°,é€‚å½“çš„å¢žåŠ è¿™ä¸ªå‚æ•°çš„å¤§å°ï¼Œå¯ä»¥æœ‰æ•ˆçš„å‡å°‘ InnoDBç±»åž‹çš„è¡¨çš„ç£ç›˜ I/O ã€‚åœ¨ä¸€ä¸ªä»¥ InnoDBä¸ºä¸»çš„ä¸“ç”¨æ•°æ®åº“æœåŠ¡å™¨ä¸Šï¼Œå¯ä»¥è€ƒè™‘æŠŠè¯¥å‚æ•°è®¾ç½®ä¸ºç‰©ç†å†…å­˜å¤§å°çš„60%-80%ã€‚
 
-²é¿´mysqlµÄ»º´æ´óÐ¡ÃüÁî£º
+æŸ¥çœ‹mysqlçš„ç¼“å­˜å¤§å°å‘½ä»¤ï¼š
 	SHOW GLOBAL VARIABLES LIKE "%buffer_pool%";
-¿ÉÒÔÍ¨¹ý±à¼­/etc/my.cnf,Ìí¼ÓÏÂÃæµÄÓï¾äÀ´ÐÞ¸Ä»º´æ´óÐ¡:
+å¯ä»¥é€šè¿‡ç¼–è¾‘/etc/my.cnf,æ·»åŠ ä¸‹é¢çš„è¯­å¥æ¥ä¿®æ”¹ç¼“å­˜å¤§å°:
 	innodb_buffer_pool_size = 2G
 
-²Î¿¼×ÊÁÏ£º
+å‚è€ƒèµ„æ–™ï¼š
 
 + <http://blog.chinaunix.net/uid-17282739-id-3201157.html>	
