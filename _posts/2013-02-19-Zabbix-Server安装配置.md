@@ -129,7 +129,11 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	[root@localhost ~]# getenforce status
 	Permissive
 	[root@localhost ~]# 
-若显示为enable，则需要setenforce 0.具体可参考：<https://support.zabbix.com/browse/ZBX-5423>
+若显示为enable，则需要：
+	[root@localhost ~]# setenforce 0
+	[root@localhost ~]# 
+具体可参考：<https://support.zabbix.com/browse/ZBX-5423>
 
 相关链接：
+
 + <https://www.zabbix.com/documentation/2.0/manual/installation/install>
