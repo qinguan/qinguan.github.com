@@ -11,32 +11,39 @@ Zabbix Server 2.0.4安装配置
 Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 
 # 配置虚机网络:
+************************************************	
 	## bridge network or hostonly network
 	# vi /etc/sysconfig/network-scripts/ifcfg-eth0
 	# /etc/rc.d/init.d/network restart
 	# chkconfig network on
+************************************************
 
 # 安装相关软件包：	
+************************************************	
 	# yum install wget make gcc mysql mysql-devel libcurl-devel \
 	net-snmp-devel openldap-devel libssh2-devel OpenIPMI-devel  \
 	java-1.7.0-openjdk java-1.7.0-openjdk-devel mysql-server httpd
 	# yum install php php-mysql php-bcmath php-mbstring php-gd php-xml
+************************************************
 
 # 添加zabbix账号:
+************************************************	
 	# groupadd zabbix
 	# useradd -g zabbix zabbix
-		
-*************************************************************************************************
+************************************************
+
 # 编译安装zabbix：
+************************************************	
 	# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.0.4/zabbix-2.0.4.tar.gz/download
 	# tar -zxvf zabbix-2.0.4.tar.gz
 	#./configure --enable-server --enable-agent --with-mysql \
 	--enable-ipv6 --with-net-snmp --with-libcurl --with-ldap \
 	--with-ssh2 --with-openipmi --enable-java
 	# make && make install
-	
-*************************************************************************************************
+************************************************
+
 # 启动mysql并进行配置:
+************************************************	
 	# service mysqld start
 	# mysql
 		create database zabbix character set utf8;
@@ -45,17 +52,19 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/schema.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/images.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/data.sql
+************************************************
 
-*************************************************************************************************
 # 修改zabbix server配置文件:
+************************************************	
 	# vi /usr/local/etc/zabbix_server.conf
 	DBUser=root --> zabbix
 	DBpassword=zabbix
+************************************************
 
-*************************************************************************************************
 # 修改PHP配置文件:
+************************************************	
 	# vi /etc/php.ini
-*************************************************
+************************************************
 	# line 440: change to Zabbix recomended
 	max_execution_time = 600
 	# line 449: change to Zabbix recomended
@@ -70,8 +79,8 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	date.timezone = Asia/Shanghai
 ************************************************
 
-************************************************
-
+# 拷贝前端代码:
+************************************************	
 	# mkdir -p /var/www/zabbix
 	# cp /root/zabbix-2.0.4/frontends/php/* /var/www/zabbix/ -R
 	# vi /etc/httpd/conf.d/zabbix.conf
@@ -84,6 +93,8 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 		</Directory>
 ************************************************
 
+# 修改前端数据库配置：
+************************************************	
 	mv /var/www/zabbix/conf/zabbix.conf.php.example /var/www/zabbix/conf/zabbix.conf.php
 	chmod 777 /var/www/zabbix/conf/zabbix.conf.php
 	vi /var/www/zabbix/conf/zabbix.conf.php
@@ -93,9 +104,10 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 		$DB["DATABASE"]                 = 'zabbix';
 		$DB["USER"]                             = 'zabbix';
 		$DB["PASSWORD"]                 = 'zabbix';
-		
 ************************************************
+
 # 启动脚本:
+************************************************	
 	# cat restart_zabbix.sh
 		#!/bin/bash
 		service iptables stop
@@ -106,7 +118,6 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 		/usr/local/sbin/zabbix_server
 		/usr/local/sbin/zabbix_agentd
 		/etc/rc.d/init.d/httpd restart
-
 ************************************************	
 
 #zabbix server is not running问题:
@@ -117,3 +128,5 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 若显示为enable，则需要setenforce 0.具体可参考：
 
 + <https://support.zabbix.com/browse/ZBX-5423>
+相关链接：
++ <ttps://www.zabbix.com/documentation/2.0/manual/installation/install>
