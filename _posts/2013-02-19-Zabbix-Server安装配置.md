@@ -1,29 +1,42 @@
 ---
 layout: post
-title: Zabbix Server安装配置
+title: Zabbix Server 2.0.4安装配置
 ---
 
-Zabbix Server安装配置
+Zabbix Server 2.0.4安装配置
 ========================
 19 Feb 2013 - Beijing
 
 
 Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 
+# 配置虚机网络:
 	## bridge network or hostonly network
 	# vi /etc/sysconfig/network-scripts/ifcfg-eth0
 	# /etc/rc.d/init.d/network restart
 	# chkconfig network on
 
-	# yum install wget make gcc mysql mysql-devel libcurl-devel net-snmp-devel \
-	openldap-devel libssh2-devel OpenIPMI-devel java-1.7.0-openjdk java-1.7.0-openjdk-devel mysql-server
+# 安装相关软件包：	
+	# yum install wget make gcc mysql mysql-devel libcurl-devel \
+	net-snmp-devel openldap-devel libssh2-devel OpenIPMI-devel  \
+	java-1.7.0-openjdk java-1.7.0-openjdk-devel mysql-server httpd
 	# yum install php php-mysql php-bcmath php-mbstring php-gd php-xml
 
+# 添加zabbix账号:
 	# groupadd zabbix
 	# useradd -g zabbix zabbix
+		
+*************************************************************************************************
+# 编译安装zabbix：
+	# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.0.4/zabbix-2.0.4.tar.gz/download
+	# tar -zxvf zabbix-2.0.4.tar.gz
+	#./configure --enable-server --enable-agent --with-mysql \
+	--enable-ipv6 --with-net-snmp --with-libcurl --with-ldap \
+	--with-ssh2 --with-openipmi --enable-java
+	# make && make install
 	
 *************************************************************************************************
-
+# 启动mysql并进行配置:
 	# service mysqld start
 	# mysql
 		create database zabbix character set utf8;
@@ -32,22 +45,15 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/schema.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/images.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/data.sql
-	
-*************************************************************************************************
-
-	# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.0.4/zabbix-2.0.4.tar.gz/download
-	# tar -zxvf zabbix-2.0.4.tar.gz
-	#./configure --enable-server --enable-agent --with-mysql --enable-ipv6  \
-	--with-net-snmp --with-libcurl --with-ldap --with-ssh2 --with-openipmi --enable-java
 
 *************************************************************************************************
-
+# 修改zabbix server配置文件:
 	# vi /usr/local/etc/zabbix_server.conf
 	DBUser=root --> zabbix
 	DBpassword=zabbix
 
 *************************************************************************************************
-
+# 修改PHP配置文件:
 	# vi /etc/php.ini
 *************************************************
 	# line 440: change to Zabbix recomended
@@ -89,7 +95,7 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 		$DB["PASSWORD"]                 = 'zabbix';
 		
 ************************************************
-
+# 启动脚本:
 	# cat restart_zabbix.sh
 		#!/bin/bash
 		service iptables stop
