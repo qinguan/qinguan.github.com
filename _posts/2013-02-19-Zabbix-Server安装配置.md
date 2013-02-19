@@ -15,11 +15,13 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	# /etc/rc.d/init.d/network restart
 	# chkconfig network on
 
-	# yum install wget make gcc mysql mysql-devel libcurl-devel net-snmp-devel openldap-devel libssh2-devel OpenIPMI-devel java-1.7.0-openjdk java-1.7.0-openjdk-devel mysql-server
+	# yum install wget make gcc mysql mysql-devel libcurl-devel net-snmp-devel \
+	openldap-devel libssh2-devel OpenIPMI-devel java-1.7.0-openjdk java-1.7.0-openjdk-devel mysql-server
 	# yum install php php-mysql php-bcmath php-mbstring php-gd php-xml
 
 	# groupadd zabbix
 	# useradd -g zabbix zabbix
+	
 *************************************************************************************************
 
 	# service mysqld start
@@ -30,20 +32,22 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/schema.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/images.sql
 	mysql -u zabbix -p zabbix < /root/zabbix-2.0.4/database/mysql/data.sql
+	
 *************************************************************************************************
 
 	# wget http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.0.4/zabbix-2.0.4.tar.gz/download
 	# tar -zxvf zabbix-2.0.4.tar.gz
-	#./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-ldap --with-ssh2 --with-openipmi --enable-java
-
-tips:./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap --enable-shared --enable-threads=posix --enable-checking=release --with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions --enable-gnu-unique-object --enable-languages=c,c++,objc,obj-c++,java,fortran,ada --enable-java-awt=gtk --disable-dssi --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-1.5.0.0/jre --enable-libgcj-multifile --enable-java-maintainer-mode --with-ecj-jar=/usr/share/java/eclipse-ecj.jar --disable-libjava-multilib --with-ppl --with-cloog --with-tune=generic --with-arch_32=i686 --build=x86_64-redhat-linux
+	#./configure --enable-server --enable-agent --with-mysql --enable-ipv6  \
+	--with-net-snmp --with-libcurl --with-ldap --with-ssh2 --with-openipmi --enable-java
 
 *************************************************************************************************
+
 	# vi /usr/local/etc/zabbix_server.conf
 	DBUser=root --> zabbix
 	DBpassword=zabbix
 
 *************************************************************************************************
+
 	# vi /etc/php.ini
 *************************************************
 	# line 440: change to Zabbix recomended
@@ -61,6 +65,7 @@ tips:./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info
 ************************************************
 
 ************************************************
+
 	# mkdir -p /var/www/zabbix
 	# cp /root/zabbix-2.0.4/frontends/php/* /var/www/zabbix/ -R
 	# vi /etc/httpd/conf.d/zabbix.conf
@@ -72,6 +77,7 @@ tips:./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info
 		Allow from all # change to the range you allow to access
 		</Directory>
 ************************************************
+
 	mv /var/www/zabbix/conf/zabbix.conf.php.example /var/www/zabbix/conf/zabbix.conf.php
 	chmod 777 /var/www/zabbix/conf/zabbix.conf.php
 	vi /var/www/zabbix/conf/zabbix.conf.php
@@ -81,7 +87,9 @@ tips:./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info
 		$DB["DATABASE"]                 = 'zabbix';
 		$DB["USER"]                             = 'zabbix';
 		$DB["PASSWORD"]                 = 'zabbix';
+		
 ************************************************
+
 	# cat restart_zabbix.sh
 		#!/bin/bash
 		service iptables stop
@@ -95,9 +103,12 @@ tips:./configure --prefix=/usr --mandir=/usr/share/man --infodir=/usr/share/info
 		setenforce 0
 
 ************************************************	
-zabbix server is not running问题:当未关闭selinux时，zabbix frontend会不断提示zabbix server is not running。可以通过以下命令查看selinux状态。
+
+#zabbix server is not running问题:
+当未关闭selinux时，zabbix frontend会不断提示zabbix server is not running。可以通过以下命令查看selinux状态。
 	[root@localhost ~]# getenforce status
 	Permissive
 	[root@localhost ~]# 
-若显示为enable，则需要setenforce 0.
-具体可参考 <https://support.zabbix.com/browse/ZBX-5423>
+若显示为enable，则需要setenforce 0.具体可参考：
+
++ <https://support.zabbix.com/browse/ZBX-5423>
