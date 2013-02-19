@@ -1,9 +1,9 @@
 ---
 layout: post
-title: Zabbix Server°²×°ÅäÖÃ
+title: Zabbix Serverå®‰è£…é…ç½®
 ---
 
-Zabbix Server°²×°ÅäÖÃ
+Zabbix Serverå®‰è£…é…ç½®
 ========================
 19 Feb 2013 - Beijing
 
@@ -94,9 +94,9 @@ vi /var/www/zabbix/conf/zabbix.conf.php
 	setenforce 0
 
 ************************************************	
-zabbix server is not runningÎÊÌâ:µ±Î´¹Ø±ÕselinuxÊ±£¬zabbix frontend»á²»¶ÏÌáÊ¾zabbix server is not running¡£¿ÉÒÔÍ¨¹ıÒÔÏÂÃüÁî²é¿´selinux×´Ì¬¡£
+zabbix server is not runningé—®é¢˜:å½“æœªå…³é—­selinuxæ—¶ï¼Œzabbix frontendä¼šä¸æ–­æç¤ºzabbix server is not runningã€‚å¯ä»¥é€šè¿‡ä»¥ä¸‹å‘½ä»¤æŸ¥çœ‹selinuxçŠ¶æ€ã€‚
 	[root@localhost ~]# getenforce status
 	Permissive
 	[root@localhost ~]# 
-ÈôÏÔÊ¾Îªenable£¬ÔòĞèÒªsetenforce 0.
-¾ßÌå¿É²Î¿¼ <https://support.zabbix.com/browse/ZBX-5423>
+è‹¥æ˜¾ç¤ºä¸ºenableï¼Œåˆ™éœ€è¦setenforce 0.
+å…·ä½“å¯å‚è€ƒ <https://support.zabbix.com/browse/ZBX-5423>
