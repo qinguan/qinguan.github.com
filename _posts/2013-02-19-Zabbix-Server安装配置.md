@@ -12,8 +12,14 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 
 # 配置虚机网络:
 ************************************************	
-	## bridge network or hostonly network
+	## bridge network or hostonly network  [VirtualBox虚拟机网络设置](http://www.douban.com/group/topic/15558388/)
 	# vi /etc/sysconfig/network-scripts/ifcfg-eth0
+		DEVICE="eth0"
+		BOOTPROTO="dhcp"
+		HWADDR="08:00:27:A4:3C:B6"
+		NM_CONTROLLED="yes"
+		ONBOOT="yes"
+		TYPE="Ethernet"
 	# /etc/rc.d/init.d/network restart
 	# chkconfig network on
 ************************************************
