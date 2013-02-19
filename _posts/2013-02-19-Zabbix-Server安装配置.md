@@ -11,8 +11,9 @@ Zabbix Server 2.0.4安装配置
 Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 
 # 配置虚机网络:
+[VirtualBox虚拟机网络设置](http://www.douban.com/group/topic/15558388/)
 ************************************************	
-	## bridge network or hostonly network  [VirtualBox虚拟机网络设置](http://www.douban.com/group/topic/15558388/)
+	## bridge network or hostonly network  
 	# vi /etc/sysconfig/network-scripts/ifcfg-eth0
 		DEVICE="eth0"
 		BOOTPROTO="dhcp"
@@ -63,26 +64,26 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 # 修改zabbix server配置文件:
 ************************************************	
 	# vi /usr/local/etc/zabbix_server.conf
-	DBUser=root --> zabbix
-	DBpassword=zabbix
+		DBUser=root --> zabbix
+		DBpassword=zabbix
 ************************************************
 
 # 修改PHP配置文件:
 ************************************************	
 	# vi /etc/php.ini
 ************************************************
-	# line 440: change to Zabbix recomended
-	max_execution_time = 600
-	# line 449: change to Zabbix recomended
-	max_input_time = 600
-	# line 457: change to Zabbix recomended
-	memory_limit = 256M
-	# line 729: change to Zabbix recomended
-	post_max_size = 32M
-	# line 878: change to Zabbix recomended
-	upload_max_filesize = 16M
-	# line 946: uncomment and add your timezone
-	date.timezone = Asia/Shanghai
+		# line 440: change to Zabbix recomended
+		max_execution_time = 600
+		# line 449: change to Zabbix recomended
+		max_input_time = 600
+		# line 457: change to Zabbix recomended
+		memory_limit = 256M
+		# line 729: change to Zabbix recomended
+		post_max_size = 32M
+		# line 878: change to Zabbix recomended
+		upload_max_filesize = 16M
+		# line 946: uncomment and add your timezone
+		date.timezone = Asia/Shanghai
 ************************************************
 
 # 拷贝前端代码:
@@ -131,6 +132,7 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 ************************************************	
 
 #zabbix server is not running问题:
+该问题具体可参考：<https://support.zabbix.com/browse/ZBX-5423>
 当未关闭selinux时，zabbix frontend会不断提示zabbix server is not running。可以通过以下命令查看selinux状态。
 	[root@localhost ~]# getenforce status
 	Permissive
@@ -138,8 +140,8 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 若显示为enable，则需要：
 	[root@localhost ~]# setenforce 0
 	[root@localhost ~]# 
-具体可参考：<https://support.zabbix.com/browse/ZBX-5423>
 
-相关链接：
+
+相关参考链接：
 
 + <https://www.zabbix.com/documentation/2.0/manual/installation/install>
