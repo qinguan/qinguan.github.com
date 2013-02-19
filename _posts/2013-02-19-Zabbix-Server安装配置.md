@@ -83,6 +83,10 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 ************************************************	
 	# mkdir -p /var/www/zabbix
 	# cp /root/zabbix-2.0.4/frontends/php/* /var/www/zabbix/ -R
+************************************************	
+
+# 修改Apache配置:
+************************************************		
 	# vi /etc/httpd/conf.d/zabbix.conf
 		Alias /zabbix /var/www/zabbix
 		<Directory "/var/www/zabbix">
@@ -125,8 +129,7 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	[root@localhost ~]# getenforce status
 	Permissive
 	[root@localhost ~]# 
-若显示为enable，则需要setenforce 0.具体可参考：
+若显示为enable，则需要setenforce 0.具体可参考：<https://support.zabbix.com/browse/ZBX-5423>
 
-+ <https://support.zabbix.com/browse/ZBX-5423>
 相关链接：
-+ <ttps://www.zabbix.com/documentation/2.0/manual/installation/install>
++ <https://www.zabbix.com/documentation/2.0/manual/installation/install>
