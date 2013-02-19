@@ -93,14 +93,13 @@ Enviroment: CentOS-6.3-i386-minimal.iso + virtual Box
 	# cat restart_zabbix.sh
 		#!/bin/bash
 		service iptables stop
+		setenforce 0
 		ps -ef | grep zabbix_server | grep -v grep | awk '{print $2}' | xargs kill 
 		ps -ef | grep zabbix_agentd | grep -v grep | awk '{print $2}' | xargs kill
 		service mysqld restart
 		/usr/local/sbin/zabbix_server
 		/usr/local/sbin/zabbix_agentd
 		/etc/rc.d/init.d/httpd restart
-		************************************************
-		setenforce 0
 
 ************************************************	
 
