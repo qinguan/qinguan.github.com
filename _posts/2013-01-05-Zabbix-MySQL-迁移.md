@@ -83,6 +83,7 @@ history_*共5张表:
 
 相关参考:
 
+
 + <zabbixzone.com/zabbix/partitioning-tables/>
 + <http://qinguan.github.com/2013/02/20/MySQL-%E8%A1%A8%E5%88%86%E5%8C%BA.html>
 + <http://www.cnblogs.com/gqdw/archive/2013/01/01/2841221.html>
