@@ -77,7 +77,7 @@ history_*共5张表:
 [zabbix-mysql-autopartitioning.sql](https://github.com/qinguan/zabbix_configure/blob/master/zabbix-mysql-autopartitioning.sql);
 	
 创建crontab,定时删除/创建分区：
-		55 23 * * * root mysql -h DBHOST -P PORT -u USER -p DB -e "CALL create_zabbix_partitions();" >> /tmp/zabbix_mysql_partition.log
+	55 23 * * * root mysql -h DBHOST -P PORT -u USER -p DB -e "CALL create_zabbix_partitions();" >> /tmp/zabbix_mysql_partition.log
 		
 当历史数据很大的时候，比如说上百G，建议先truncate table,清空数据;
 
