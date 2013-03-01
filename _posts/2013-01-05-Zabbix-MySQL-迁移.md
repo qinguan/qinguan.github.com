@@ -46,9 +46,11 @@ Search for $DB["SERVER"] and change the ip address to IP Address.
 
 2. 表分区
 =====
+
 注； 分区主要针对history_*表
-Zabbix自身有housekeeper机制，会定时删除相应的历史数据，但是该操作效率低下。
-采用: disable housekeeper, partition table, create and drop table partitions.
+
+a. Zabbix自身有housekeeper机制，会定时删除相应的历史数据，但是该操作效率低下。
+b. 采用: disable housekeeper, partition table, create and drop table partitions.
 
 history_*共5张表:
 	| history_log           |
@@ -73,8 +75,8 @@ history_*共5张表:
 	);
 
 创建mysql procedures：
-	source zabbix-mysql-autopartitioning.sql
-[zabbix-mysql-autopartitioning.sql](https://github.com/qinguan/zabbix_configure/blob/master/zabbix-mysql-autopartitioning.sql);
+	source zabbix-mysql-autopartitioning.sql;
+[zabbix-mysql-autopartitioning.sql](https://github.com/qinguan/zabbix_configure/blob/master/zabbix-mysql-autopartitioning.sql)
 	
 创建crontab,定时删除/创建分区：
 	55 23 * * * root mysql -h DBHOST -P PORT -u USER -p DB -e "CALL create_zabbix_partitions();" >> /tmp/zabbix_mysql_partition.log
@@ -85,5 +87,6 @@ history_*共5张表:
 
 
 + <zabbixzone.com/zabbix/partitioning-tables/>
+
 + <http://qinguan.github.com/2013/02/20/MySQL-%E8%A1%A8%E5%88%86%E5%8C%BA.html>
 + <http://www.cnblogs.com/gqdw/archive/2013/01/01/2841221.html>
