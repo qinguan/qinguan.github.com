@@ -80,3 +80,9 @@ history_*共5张表:
 		55 23 * * * root mysql -h DBHOST -P PORT -u USER -p DB -e "CALL create_zabbix_partitions();" >> /tmp/zabbix_mysql_partition.log
 		
 当历史数据很大的时候，比如说上百G，建议先truncate table,清空数据;
+
+相关参考:
+
++ <zabbixzone.com/zabbix/partitioning-tables/>
++ <http://qinguan.github.com/2013/02/20/MySQL-%E8%A1%A8%E5%88%86%E5%8C%BA.html>
++ <http://www.cnblogs.com/gqdw/archive/2013/01/01/2841221.html>
