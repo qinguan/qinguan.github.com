@@ -50,6 +50,7 @@ Search for $DB["SERVER"] and change the ip address to IP Address.
 注； 分区主要针对history_*表
 
 a. Zabbix自身有housekeeper机制，会定时删除相应的历史数据，但是该操作效率低下。
+
 b. 采用: disable housekeeper, partition table, create and drop table partitions.
 
 history_*共5张表:
