@@ -87,6 +87,7 @@ history_*共5张表:
 
 
 + <http://zabbixzone.com/zabbix/partitioning-tables/>
++ <http://www.mysqlperformanceblog.com/2010/12/11/mysql-partitioning-can-save-you-or-kill-you/>
 + <https://www.zabbix.com/forum/showthread.php?t=24983>
 + <https://support.zabbix.com/browse/ZBX-4840>
 + <http://qinguan.github.com/2013/02/20/MySQL-%E8%A1%A8%E5%88%86%E5%8C%BA.html>
