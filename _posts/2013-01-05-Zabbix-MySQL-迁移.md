@@ -56,7 +56,7 @@ b. 采用: disable housekeeper, partition table, create and drop table partition
 history_*共5张表:
 	| history_log           |
 	| history_str           |
-	| history_sync          |
+	| history               |
 	| history_text          |
 	| history_uint          |
 
