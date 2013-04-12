@@ -25,7 +25,7 @@ Zabbix Proxy配置
 	echo "********************Configure database,default use sqlite3***************************"
 	mkdir -p /var/lib/sqlite
 	chmod -R 777  /var/lib/sqlite
-	wget http://monitor.qiyi.virtual/download/zabbix_soft/zabbix_sqlite3_schema.sql
+	# get zabbix_sqlite3_schema.sql from zabbix source package: zabbix/database/sqlite3/schema.sql
 	if [ -f zabbix_sqlite3_schema.sql ]; then
 		 sqlite3 /var/lib/sqlite/zabbix.db < zabbix_sqlite3_schema.sql    
 	else
