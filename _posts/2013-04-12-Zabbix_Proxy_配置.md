@@ -7,57 +7,11 @@ Zabbix Proxy配置
 ========================
 12 April 2013 - Beijing
 
-	#!/bin/bash
-	# install the zabbix proxy 2.0.3
+当Zabbix监控的机器越来越多的时候，Zabbix Server以及后端数据库压力会很大，尤其是数据库，并发读写操作异常频繁。
+目前有两种方式可以缓解，一是采用Node方式，一是采用Proxy方式。
 
-	echo "**********************Download proxy rpm package***********************"
-	wget http://repo.zabbixzone.com/centos/6Server/x86_64/zabbix-proxy-2.0.3-1.el6.x86_64.rpm
-	wget http://repo.zabbixzone.com/centos/6Server/x86_64/zabbix-proxy-sqlite3-2.0.3-1.el6.x86_64.rpm
 
-	echo "*****************************Install proxy*****************************************"
-	yum install unixODBC.x86_64 OpenIPMI-libs.x86_64 net-snmp.x86_64 fping.x86_64
-	if [ $? -ne 0 ]; then
-		 echo "check install: nixODBC.x86_64 OpenIPMI-libs.x86_64 net-snmp.x86_64 fping.x86_64"
-		 exit
-	fi
-	rpm -ivh zabbix-proxy-2.0.3-1.el6.x86_64.rpm zabbix-proxy-sqlite3-2.0.3-1.el6.x86_64.rpm
-
-	echo "******************Configure database,default use sqlite3*******************"
-	mkdir -p /var/lib/sqlite
-	chmod -R 777  /var/lib/sqlite
-	#get zabbix_sqlite3_schema.sql 
-	#from zabbix source package: zabbix/database/sqlite3/schema.sql
-	if [ -f zabbix_sqlite3_schema.sql ]; then
-		 sqlite3 /var/lib/sqlite/zabbix.db < zabbix_sqlite3_schema.sql    
-	else
-		 echo "missing zabbix_sqlite3_schema.sql file."
-		 exit
-	fi
-
-	echo "*****************************Configure proxy*******************************"
-	conf_file=/etc/zabbix/zabbix_proxy.conf
-	a='Server=127.0.0.1'
-	b='Hostname=Zabbix proxy'
-	c='DBName=zabbix'
-
-	a1='Server=monitor.qiyi.virtual'
-	b1='Hostname='`hostname`
-	c1='DBName=/var/lib/sqlite/zabbix.db'
-
-	conf_file=/etc/zabbix/zabbix_proxy.conf
-	if [ -f $conf_file ];then
-		sed -i "s/$a/$a1/g" $conf_file
-		sed -i "s/$b/$b1/g" $conf_file
-		sed -i "s/$c/$c1/g" $conf_file
-	else
-		echo "missing $conf_file file."
-		exit;
-	fi
-
-	chkconfig zabbix-proxy on
-
-	echo "*****************************Start proxy*************************************"
-	/usr/sbin/zabbix_proxy
+Proxy部署脚本见： [zabbix_proxy_install](https://github.com/qinguan/zabbix_configure/blob/master/zabbix_proxy_install.sh)
 	
 相关参考链接：
 	
