@@ -8,7 +8,7 @@ Troubleshooting
 20 April 2013 - Beijing
 
 *************************
-Problem: Linux时间不同步
+#Problem: Linux时间不同步
 
 Solution:
 ubuntu:
@@ -16,7 +16,7 @@ ubuntu:
 	sudo /usr/sbin/ntpdate cn.pool.ntp.org
 
 *************************
-Problem: Xshell终端乱码
+#Problem: Xshell终端乱码
 
 Solution:
 Session Proterties->Terminal->Encodeing: change "Default Language" to "Unicode(UTF-8)"
@@ -24,11 +24,13 @@ Session Proterties->Terminal->Encodeing: change "Default Language" to "Unicode(U
 (临时修改: export LANG=en_US.UTF-8)
 
 *************************
-Problem: no version information available (required by /usr/lib/libcurl.so.4)
+#Problem: no version information available (required by /usr/lib/libcurl.so.4)
 
 	$ curl localhost:8090/hello.html
-	curl: /usr/local/lib/libldap_r-2.4.so.2: no version information available (required by /usr/lib/libcurl.so.4)
-	curl: /usr/local/lib/liblber-2.4.so.2: no version information available (required by /usr/lib/libcurl.so.4)
+	curl: /usr/local/lib/libldap_r-2.4.so.2: no version information available 
+		(required by /usr/lib/libcurl.so.4)
+	curl: /usr/local/lib/liblber-2.4.so.2: no version information available 
+		(required by /usr/lib/libcurl.so.4)
 	hello world
 	$
 Solution:
@@ -40,10 +42,11 @@ Solution:
 	-s, --symbolic		创建符号链接而非硬链接
 	
 同类问题:	
-	git: /usr/local/lib/liblber-2.4.so.2: no version information available (required by /usr/lib/libcurl-gnutls.so.4)
+	git: /usr/local/lib/liblber-2.4.so.2: no version information available 
+		(required by /usr/lib/libcurl-gnutls.so.4)
 	
 *************************
-Problem: git push提示username & password
+#Problem: git push提示username & password
 
 Solution:
 	use git not https,for example:
