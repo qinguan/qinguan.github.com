@@ -1,0 +1,142 @@
+---
+layout: post
+title: 远程图片转化为二进制流POST提交
+---
+
+远程图片转化为二进制流POST提交
+========================
+18 May 2013 - Beijing	
+	
+	问题源于QQ互联的一个API [add_pic_t](http://wiki.open.qq.com/wiki/website/add_pic_t),该接口的功能是：上传一张图片，并发布一条消息到腾讯微博平台上。
+	这个API的必须参数中有个类型是binary的pic，该参数要求发送请求时，图片内容以二进制数据流的形式发送。
+	
+	然后有个需求，设计一个接口，根据图片的url直接发起对该API的请求进行图片分享，即首先需要从指定url上抓起图片下来，然后转换为二进制流POST提交到add_pic_t这个接口上。
+		
+	针对给定url的网络图片，会存在2个问题：
+	1、首先需要从网上把图片抓下来，进行缓存；两种存储方式: 内存和临时文件。
+	如果是内存的话，Server端请求并发数目受限于图片大小和内存；如果是临时文件，则受限于server端同一时间段能打开的文件数目。
+	这两种存储方式都会影响到Server端接口的并发性能。
+	2、根据url不知道网络图片有多大，而读取图片内容需要一定时间(受限于网络环境)，会影响接口的响应速度，造成延时，影响体验；
+	
+	预计这个接口设计的应用场景应该是本地图片文件的上传，类似于手机端微信图片上传、QQ微博用户PC端本地图片上传等类型。
+	
+	public void testHttPost1() throws FileNotFoundException{
+		HttpClient client = new HttpClient();
+		client.getHttpConnectionManager().getParams().setConnectionTimeout(5000);
+		
+		PostMethod method = new PostMethod("https://graph.qq.com/t/add_pic_t");
+		FilePart bfp = new FilePart("pic", new File("backgroud.jpg"));
+		bfp.setContentType("image/*");
+		bfp.setName("pic");
+
+		StringPart atoken = new StringPart("access_token",
+				"DFC7D63F3EDA6DCB3CA3E8505CED44A7", "UTF-8");
+		StringPart oauth_consumer_key = new StringPart("oauth_consumer_key",
+				"100330589", "UTF-8");
+		StringPart openid = new StringPart("openid",
+				"DECB99D2D871E354B6ED7B69923390D0", "UTF-8");
+		StringPart content = new StringPart("content", "Tuzki 1", "UTF-8");
+
+		Part[] parts = { atoken, oauth_consumer_key, openid, content, bfp };
+		method.setRequestEntity(new MultipartRequestEntity(parts, method.getParams()));
+		try {
+			int code = client.executeMethod(method);
+			String msg = method.getResponseBodyAsString();
+			System.out.print(msg);
+		} catch (HttpException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void testHttpPost2(){
+		HttpURLConnection conn = null;  
+        String BOUNDARY = "---------------------------xgj1368838341447"; //boundary就是request头和上传文件内容的分隔符  
+        try {  
+            URL url = new URL("https://graph.qq.com/t/add_pic_t");  
+            String imgurl ="http://f.hiphotos.baidu.com/album/w%3D2048/sign=63e67b0fb8389b5038ffe752b10de5dd/9d82d158ccbf6c81d53d4df9bd3eb13533fa409c.jpg";
+            conn = (HttpURLConnection) url.openConnection();  
+            conn.setConnectTimeout(5000);  
+            conn.setReadTimeout(30000);  
+            conn.setDoOutput(true);  
+            conn.setDoInput(true);  
+            conn.setUseCaches(false);  
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Accept-Charset","utf-8");
+            conn.setRequestProperty("Connection", "Keep-Alive");  
+            //conn.setRequestProperty("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 6.1; zh-CN; rv:1.9.2.6)");  
+            conn.setRequestProperty("Content-Type","multipart/form-data; boundary=" + BOUNDARY);  
+  
+            OutputStream out = new DataOutputStream(conn.getOutputStream());  
+            
+            Map<String, String> params = new HashMap<String,String>();
+            params.put("access_token", "DFC7D63F3EDA6DCB3CA3E8505CED44A7");
+            params.put("oauth_consumer_key", "100330589");
+            params.put("openid", "DECB99D2D871E354B6ED7B69923390D0");
+            params.put("content", "我在 712 A " + imgurl)); //链接
+            
+            if (params != null) {  
+                StringBuffer strBuf = new StringBuffer();  
+                Iterator iter = params.entrySet().iterator();  
+                while (iter.hasNext()) {  
+                    Map.Entry entry = (Map.Entry) iter.next();  
+                    String inputName = (String) entry.getKey();  
+                    String inputValue = (String) entry.getValue();  
+                    if (inputValue == null) {  
+                        continue;  
+                    }  
+                    strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");  
+                    strBuf.append("Content-Disposition: form-data; name=\"" + inputName + "\"\r\n\r\n");  
+                    strBuf.append(inputValue);  
+                }  
+                out.write(strBuf.toString().getBytes());  
+            }  
+  
+            url = new URL(imgurl);
+
+            StringBuffer strBuf = new StringBuffer();  
+            strBuf.append("\r\n").append("--").append(BOUNDARY).append("\r\n");
+            strBuf.append("Content-Disposition: form-data; name=\"pic\"; filename=\"" + "hello" + "\"\r\n");
+            strBuf.append("Content-Type:image/* \r\n\r\n");
+            out.write(strBuf.toString().getBytes());  
+            		
+            BufferedInputStream in = new BufferedInputStream(url.openStream());  
+            ByteArrayOutputStream out_img = new ByteArrayOutputStream();
+            int t;  
+            while ((t = in.read()) != -1) {  
+                out_img.write(t);
+            } 
+            byte[] b = out_img.toByteArray();
+            out.write(b);
+            in.close();
+            
+            byte[] endData = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();  
+            out.write(endData);
+            out.flush();  
+            out.close();
+              
+            //提出来，判断返回值，若错误，尝试不发图的请求
+            strBuf = new StringBuffer();  
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));  
+            String line = null;  
+            while ((line = reader.readLine()) != null) {  
+                strBuf.append(line).append("\n");  
+            }  
+            String res = strBuf.toString();  
+            reader.close();
+            System.out.print(res);
+            
+            
+        } catch (Exception e) {  
+            System.out.println("send POST request failed. url=" + "https://graph.qq.com/t/add_pic_t" + " imgurl=" + imgurl);  
+            e.printStackTrace();  
+        } finally {  
+            if (conn != null) {  
+                conn.disconnect();  
+                conn = null;  
+            }  
+        }  
+  
+	}
