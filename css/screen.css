@@ -155,6 +155,12 @@ ul.posts {
 
   /* standard */
 
+  #post a {
+	a:link {color:#FF0000;}    /* 未被访问的链接 */
+	a:visited {color:#00FF00;} /* 已被访问的链接 */
+	a:hover {color:#FF00FF;}   /* 鼠标指针移动到链接上 */
+	a:active {color:#0000FF;}  /* 正在被点击的链接 */
+  }
   #post pre {
     border: 1px solid #ddd;
     background-color: #eef;
