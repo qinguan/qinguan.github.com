@@ -148,6 +148,28 @@ ul.posts {
         border: 0;
       }
 
+	  
+	  
+#content
+{
+	clear: left;
+	float: left;
+	width: 560px;
+	padding: 20px 0;
+	margin: 0 0 0 30px;
+	display: inline;
+}
+
+#aside
+{
+	float: right;
+	width: 240px;
+	padding: 20px 0;
+	margin: 0 20px 0 0;
+	display: inline;
+}
+#aside h3 { margin: 0; }
+	  
 /*****************************************************************************/
 /*
 /* Posts
