@@ -148,14 +148,6 @@ ul.posts {
         border: 0;
       }
 
-#content-container
-{
-	float: left;
-	width: 100%;
-	color: #000;
-	background: #eee;
-}
-
 #content
 {
 	clear: left;
