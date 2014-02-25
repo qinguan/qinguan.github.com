@@ -148,7 +148,25 @@ ul.posts {
         border: 0;
       }
 
-	  
+#content-container
+{
+	float: left;
+	width: 100%;
+	color: #000;
+	background: #eee;
+}
+
+#content-container2
+{
+	margin: 0 auto;
+	width: 900px;
+}
+
+#content-container3
+{
+	float: left;
+	width: 900px;
+}
 	  
 #content
 {
