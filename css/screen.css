@@ -148,6 +148,10 @@ ul.posts {
         border: 0;
       }
 
+#content-container{
+	float: left;
+	width: 100%;
+}
 #content
 {
 	clear: left;
