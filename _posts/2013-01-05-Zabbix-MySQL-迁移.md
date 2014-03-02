@@ -3,7 +3,7 @@ layout: post
 title: Zabbix MySQL 迁移及表分区
 description: ""
 category: MySQL
-tags: [MySQL, Zabbix]
+tags: [Zabbix, MySQL]
 ---
 
 Zabbix MySQL 迁移及表分区
