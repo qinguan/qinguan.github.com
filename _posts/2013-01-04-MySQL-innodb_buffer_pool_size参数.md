@@ -1,6 +1,9 @@
 ---
 layout: post
 title: MySQL innodb_buffer_pool_size参数
+description: ""
+category: MySQL
+tags: [MySQL]
 ---
 
 MySQL innodb_buffer_pool_size参数
