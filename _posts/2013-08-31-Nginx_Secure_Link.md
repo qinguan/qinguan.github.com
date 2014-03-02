@@ -1,6 +1,9 @@
 ---
 layout: post
 title: Nginx Secure Link
+description: ""
+category: Web Server
+tags: [nginx]
 ---
 
 Nginx Secure Link
