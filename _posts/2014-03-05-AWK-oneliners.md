@@ -1,6 +1,9 @@
-﻿---
+---
 layout: post
-title: AWK
+title: AWK One Liners
+description: ""
+category: AWK
+tags: [AWK]
 ---
 
 AWK One Liners
