@@ -1,13 +1,10 @@
 ﻿---
 layout: post
 title: AWK One Liners
-description: "AWK"
-category: AWK
-tags: [AWK]
 ---
 
 
-AWK One liners
+AWK One Liners
 ======
 
 patten { action }
