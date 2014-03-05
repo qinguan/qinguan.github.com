@@ -1,6 +1,6 @@
 ﻿---
 layout: post
-title: AWK One Liners
+title: AWK
 ---
 
 AWK One Liners
