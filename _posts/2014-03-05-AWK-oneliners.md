@@ -3,7 +3,6 @@ layout: post
 title: AWK One Liners
 ---
 
-
 AWK One Liners
 ======
 
