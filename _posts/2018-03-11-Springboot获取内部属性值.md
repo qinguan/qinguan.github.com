@@ -43,22 +43,21 @@ springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信
 2. 接口方式
 --
     - 通过接口等方式暴露出去，那么首先需要在服务运行时，能够拿到这些属性值。
-    - 一种方式可以通过Java Properties来load属性文件，如下:
+        1. 通过Java Properties来load属性文件。
+        2. 实现Spring的 EnvironmentAware接口，在setEnvironment方法中获取属性值。
 
 ```Java
+        # 第一种
         private static Properties PROJECT_PROPERTIES = new Properties();
         PROJECT_PROPERTIES.load(BOOT.class.getClassLoader().getResourceAsStream("application.properties"));
 
-        然后就能拿到相关的属性值:
+        # 然后就能拿到相关的属性值
         String version = PROJECT_PROPERTIES.getProperty("info.git-version");
         String buildTime = PROJECT_PROPERTIES.getProperty("info.app-build-time");
 ```
 
-
-    - 另一种方式是实现Spring的 EnvironmentAware接口，想要暴露的属性在setEnvironment方法中进行赋值，如下：
-
-
 ```Java
+        # 第二种
         public class TestAbc implements EnvironmentAware {
             private String gitVersion;
             private String buildTime;
