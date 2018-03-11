@@ -50,13 +50,10 @@ springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信
         # 第一种
         private static Properties PROJECT_PROPERTIES = new Properties();
         PROJECT_PROPERTIES.load(BOOT.class.getClassLoader().getResourceAsStream("application.properties"));
-
         # 然后就能拿到相关的属性值
         String version = PROJECT_PROPERTIES.getProperty("info.git-version");
         String buildTime = PROJECT_PROPERTIES.getProperty("info.app-build-time");
-```
 
-```Java
         # 第二种
         public class TestAbc implements EnvironmentAware {
             private String gitVersion;
