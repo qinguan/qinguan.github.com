@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Maven打包使用代码版本号和时间戳 | QINGUAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="为了显示区分部署代码版本，一般会在打包的时候带上SVN/Git版本号，如果是多机房部署的，还需要带上机房标签。 若代码发布在Git仓库，可以使用maven插件git-commit-id-plugin。该插件会产生一个git.properties文件，并被包含进最终的jar文件中。简单配置如下： 1234567891011121314151617181920212223242526272829303">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven打包使用代码版本号和时间戳">
+<meta property="og:url" content="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/index.html">
+<meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="为了显示区分部署代码版本，一般会在打包的时候带上SVN/Git版本号，如果是多机房部署的，还需要带上机房标签。 若代码发布在Git仓库，可以使用maven插件git-commit-id-plugin。该插件会产生一个git.properties文件，并被包含进最终的jar文件中。简单配置如下： 1234567891011121314151617181920212223242526272829303">
+<meta property="og:updated_time" content="2018-03-11T14:49:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Maven打包使用代码版本号和时间戳">
+<meta name="twitter:description" content="为了显示区分部署代码版本，一般会在打包的时候带上SVN/Git版本号，如果是多机房部署的，还需要带上机房标签。 若代码发布在Git仓库，可以使用maven插件git-commit-id-plugin。该插件会产生一个git.properties文件，并被包含进最终的jar文件中。简单配置如下： 1234567891011121314151617181920212223242526272829303">
+  
+    <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">QINGUAN</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-maven-package-with-version-and-timestamp" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/11/maven-package-with-version-and-timestamp/" class="article-date">
+  <time datetime="2018-03-11T12:35:10.000Z" itemprop="datePublished">2018-03-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Maven打包使用代码版本号和时间戳
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>为了显示区分部署代码版本，一般会在打包的时候带上SVN/Git版本号，如果是多机房部署的，还需要带上机房标签。</p>
+<p>若代码发布在Git仓库，可以使用maven插件<a href="https://github.com/ktoso/maven-git-commit-id-plugin" target="_blank" rel="noopener">git-commit-id-plugin</a>。<br>该插件会产生一个git.properties文件，并被包含进最终的jar文件中。<br>简单配置如下：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">       &lt;groupId&gt;pl.project13.maven&lt;/groupId&gt;</span><br><span class="line">       &lt;artifactId&gt;git-commit-id-plugin&lt;/artifactId&gt;</span><br><span class="line">       &lt;version&gt;2.2.4&lt;/version&gt;</span><br><span class="line">       &lt;executions&gt;</span><br><span class="line">           &lt;execution&gt;</span><br><span class="line">               &lt;goals&gt;</span><br><span class="line">                   &lt;goal&gt;revision&lt;/goal&gt;</span><br><span class="line">               &lt;/goals&gt;</span><br><span class="line">           &lt;/execution&gt;</span><br><span class="line">       &lt;/executions&gt;</span><br><span class="line">       &lt;configuration&gt;</span><br><span class="line">           &lt;!-- 使properties扩展到整个maven bulid 周期</span><br><span class="line">           Ref: https:<span class="comment">//github.com/ktoso/maven-git-commit-id-plugin/issues/280 --&gt;</span></span><br><span class="line">           &lt;injectAllReactorProjects&gt;true&lt;/injectAllReactorProjects&gt;</span><br><span class="line">           &lt;!--日期格式;默认值:dd.MM.yyyy <span class="string">'@'</span> HH:mm:ss z;--&gt;</span><br><span class="line">           &lt;dateFormat&gt;yyyyMMddHHmmss&lt;/dateFormat&gt;</span><br><span class="line">           &lt;!--,构建过程中,是否打印详细信息;默认值:<span class="keyword">false</span>;--&gt;</span><br><span class="line">           &lt;verbose&gt;true&lt;/verbose&gt;</span><br><span class="line">           &lt;!--是否生成<span class="string">"git.properties"</span>文件;默认值:<span class="keyword">false</span>;--&gt;</span><br><span class="line">           &lt;generateGitPropertiesFile&gt;true&lt;/generateGitPropertiesFile&gt;</span><br><span class="line">           &lt;!-- <span class="string">".git"</span>文件路径;默认值:$&#123;project.basedir&#125;/.git; ..表示上一级--&gt;</span><br><span class="line">           &lt;dotGitDirectory&gt;$&#123;project.basedir&#125;/../.git&lt;/dotGitDirectory&gt;</span><br><span class="line">           &lt;gitDescribe&gt;</span><br><span class="line">               &lt;!--提交操作ID显式字符长度,最大值为:<span class="number">40</span>;默认值:<span class="number">7</span>;<span class="number">0</span>代表特殊意义;--&gt;</span><br><span class="line">               &lt;abbrev&gt;7&lt;/abbrev&gt;</span><br><span class="line">               &lt;!--构建触发时,代码有修改时(即<span class="string">"dirty state"</span>),添加指定后缀;默认值:<span class="string">""</span>;--&gt;</span><br><span class="line">               &lt;dirty&gt;-dirty&lt;/dirty&gt;</span><br><span class="line">           &lt;/gitDescribe&gt;</span><br><span class="line">       &lt;/configuration&gt;</span><br><span class="line">   &lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
+<p>项目module可以配置打包的finalName如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;finalName&gt;</span><br><span class="line">	project-<span class="keyword">module</span>-$&#123;dc&#125;-$&#123;git.commit.id.abbrev&#125;-$&#123;git.build.time&#125;</span><br><span class="line">&lt;/finalName&gt;</span><br></pre></td></tr></table></figure></p>
+<p>其中git.commit.id.abbre是提交Git仓库时的版本号缩写，git.build.time顾名思义是打包时间。</p>
+<p>对应的maven打包命令如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean <span class="keyword">package</span> -Dmaven.test.skip=<span class="keyword">true</span> -Ddc=$dc -P $dc</span><br></pre></td></tr></table></figure>
+<p>若有多机房信息，为方便配置，一般会将profile配置成机房编码，这样上面的机房dc参数和项目profile参数即可以共享同一个参数值。</p>
+<p>打包时间还可以通过另外一个maven插件<a href="http://www.mojohaus.org/build-helper-maven-plugin/" target="_blank" rel="noopener">build-helper-maven-plugin</a>读取。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;build-helper-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;3.0.0&lt;/version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">              &lt;id&gt;timestamp-property&lt;/id&gt;</span><br><span class="line">              &lt;goals&gt;</span><br><span class="line">                  &lt;goal&gt;timestamp-property&lt;/goal&gt;</span><br><span class="line">              &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">      &lt;/executions&gt;</span><br><span class="line">      &lt;configuration&gt;</span><br><span class="line">          &lt;name&gt;current.time&lt;/name&gt;</span><br><span class="line">          &lt;pattern&gt;yyyyMMddHHmmss&lt;/pattern&gt;</span><br><span class="line">          &lt;timeZone&gt;GMT+8&lt;/timeZone&gt;</span><br><span class="line">      &lt;/configuration&gt;</span><br><span class="line">  &lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
+<p>上述current.time字段值即是打包时间，可以被pom文件引用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjemx1i0x0002sy4gp2l3pq62" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/03/11/jd/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          招聘
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/11/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/spring-boot-internal-properties-read/">Springboot获取内部属性值</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/jd/">招聘</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/maven-package-with-version-and-timestamp/">Maven打包使用代码版本号和时间戳</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Xu Guojun<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
