@@ -7,16 +7,16 @@
   
   <title>Springboot获取内部属性值 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="为了检测线上服务的版本是否正确，需要通过一定的方式保留当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要定制一些方式来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本是否">
+  <meta name="description" content="为了实时检测线上服务的版本是否正确，需要通过一定的方式暴露当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要采取一些措施来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Springboot获取内部属性值">
 <meta property="og:url" content="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/index.html">
 <meta property="og:site_name" content="QINGUAN">
-<meta property="og:description" content="为了检测线上服务的版本是否正确，需要通过一定的方式保留当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要定制一些方式来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本是否">
-<meta property="og:updated_time" content="2018-03-11T14:49:33.000Z">
+<meta property="og:description" content="为了实时检测线上服务的版本是否正确，需要通过一定的方式暴露当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要采取一些措施来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本">
+<meta property="og:updated_time" content="2018-03-12T15:05:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Springboot获取内部属性值">
-<meta name="twitter:description" content="为了检测线上服务的版本是否正确，需要通过一定的方式保留当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要定制一些方式来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本是否">
+<meta name="twitter:description" content="为了实时检测线上服务的版本是否正确，需要通过一定的方式暴露当前运行服务的版本信息。springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。 但有时候为了兼容已有的监控或者部署工具，需要采取一些措施来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -87,33 +87,35 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>为了检测线上服务的版本是否正确，需要通过一定的方式保留当前运行服务的版本信息。<br>springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。</p>
-<p>但有时候为了兼容已有的监控或者部署工具，需要定制一些方式来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本是否正确无误的。</p>
-<ol>
+        <p>为了实时检测线上服务的版本是否正确，需要通过一定的方式暴露当前运行服务的版本信息。<br>springboot可以很方便的通过spring-boot-actuator来暴露各种endpoint信息，很适合服务的监控。</p>
+<p>但有时候为了兼容已有的监控或者部署工具，需要采取一些措施来支持相关信息的暴露。如Jar内部属性文件，如HTTP接口，然后监控部署服务通过检查属性文件或者调用相关服务接口来确认当前服务部署版本是否是目标版本。</p>
+<ul>
 <li><h2 id="内部属性文件方式"><a href="#内部属性文件方式" class="headerlink" title="内部属性文件方式"></a>内部属性文件方式</h2><ul>
-<li>可以通过<a href="https://github.com/ktoso/maven-git-commit-id-plugin" target="_blank" rel="noopener">git-commit-id-plugin</a>生成git.properties文件等方式。参见<a href="http://qinguan.github.io/2018/03/11/Maven%E6%89%93%E5%8C%85%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%A0%81%E7%89%88%E6%9C%AC%E5%8F%B7%E5%92%8C%E6%97%B6%E9%97%B4%E6%88%B3.html">此文</a></li>
+<li>可以通过<a href="https://github.com/ktoso/maven-git-commit-id-plugin" target="_blank" rel="noopener">git-commit-id-plugin</a>生成git.properties文件等方式。参见<a href="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/">此文</a></li>
 <li>或者通过<a href="https://maven.apache.org/plugins/maven-resources-plugin/" target="_blank" rel="noopener">maven-resources-plugin</a>给动态给属性文件中的属性赋值。下面的配置实例可以在编译的时候，将git.commit.id.abbrev和git.build.time分别赋值给info节点的git-version属性和app-build-time属性。</li>
+<li>这样就将项目的部分属性值写入到了文件中。</li>
 </ul>
 </li>
-</ol>
+</ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#application.properties</span><br><span class="line">info.git-version=<span class="meta">@git</span>.commit.id.abbrev@</span><br><span class="line">info.app-build-time=<span class="meta">@git</span>.build.time@ </span><br><span class="line"></span><br><span class="line">#pom.xml</span><br><span class="line">&lt;plugin&gt;</span><br><span class="line">    &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;maven-resources-plugin&lt;/artifactId&gt;</span><br><span class="line">    &lt;version&gt;2.6&lt;/version&gt;</span><br><span class="line">    &lt;configuration&gt;</span><br><span class="line">        &lt;delimiters&gt;</span><br><span class="line">            &lt;delimiter&gt;@&lt;/delimiter&gt;</span><br><span class="line">        &lt;/delimiters&gt;</span><br><span class="line">        &lt;useDefaultDelimiters&gt;false&lt;/useDefaultDelimiters&gt;</span><br><span class="line">    &lt;/configuration&gt;</span><br><span class="line">&lt;/plugin&gt;</span><br><span class="line"></span><br><span class="line">最终打包好的application.properties文件属性会变成如下:</span><br><span class="line">info.git-version=b0145c5</span><br><span class="line">info.app-build-time=<span class="number">20180309205538</span></span><br></pre></td></tr></table></figure>
-<ol>
+<ul>
 <li><h2 id="接口方式"><a href="#接口方式" class="headerlink" title="接口方式"></a>接口方式</h2><ul>
 <li>通过接口等方式暴露出去，那么首先需要在服务运行时，能够拿到这些属性值。<ol>
 <li>通过Java Properties来load属性文件。</li>
 <li>实现Spring的 EnvironmentAware接口，在setEnvironment方法中获取属性值。</li>
+<li>通过Spring的@Value注解。</li>
 </ol>
 </li>
 </ul>
 </li>
-</ol>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># 第一种</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Properties PROJECT_PROPERTIES = <span class="keyword">new</span> Properties();</span><br><span class="line">PROJECT_PROPERTIES.load(BOOT.class.getClassLoader().getResourceAsStream(<span class="string">"application.properties"</span>));</span><br><span class="line"># 然后就能拿到相关的属性值</span><br><span class="line">String version = PROJECT_PROPERTIES.getProperty(<span class="string">"info.git-version"</span>);</span><br><span class="line">String buildTime = PROJECT_PROPERTIES.getProperty(<span class="string">"info.app-build-time"</span>);</span><br><span class="line"></span><br><span class="line"># 第二种</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAbc</span> <span class="keyword">implements</span> <span class="title">EnvironmentAware</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String gitVersion;</span><br><span class="line">    <span class="keyword">private</span> String buildTime;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> startTime = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEnvironment</span><span class="params">(Environment environment)</span> </span>&#123;</span><br><span class="line">        gitVersion = environment.getProperty(<span class="string">"info.git-version"</span>);</span><br><span class="line">        buildTime = environment.getProperty(<span class="string">"info.app-build-time"</span>);</span><br><span class="line">        startTime = ManagementFactory.getRuntimeMXBean().getStartTime();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</ul>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"># 第一种</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Properties PROJECT_PROPERTIES = <span class="keyword">new</span> Properties();</span><br><span class="line">PROJECT_PROPERTIES.load(BOOT.class.getClassLoader().getResourceAsStream(<span class="string">"application.properties"</span>));</span><br><span class="line"># 然后就能拿到相关的属性值</span><br><span class="line">String version = PROJECT_PROPERTIES.getProperty(<span class="string">"info.git-version"</span>);</span><br><span class="line">String buildTime = PROJECT_PROPERTIES.getProperty(<span class="string">"info.app-build-time"</span>);</span><br><span class="line"></span><br><span class="line"># 第二种</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAbc</span> <span class="keyword">implements</span> <span class="title">EnvironmentAware</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String gitVersion;</span><br><span class="line">    <span class="keyword">private</span> String buildTime;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> startTime = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEnvironment</span><span class="params">(Environment environment)</span> </span>&#123;</span><br><span class="line">        gitVersion = environment.getProperty(<span class="string">"info.git-version"</span>);</span><br><span class="line">        buildTime = environment.getProperty(<span class="string">"info.app-build-time"</span>);</span><br><span class="line">        startTime = ManagementFactory.getRuntimeMXBean().getStartTime();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"># 第三种</span><br><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;info.git-version&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String gitVersion;</span><br><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;info.app-build-time&#125;"</span>)    </span><br><span class="line"><span class="keyword">private</span> String buildTime;</span><br><span class="line"># 注意: 这里的info.git-version就是指前述属性文件application.properties中的属性字段</span><br><span class="line"># info.app-build-time以此类推。</span><br></pre></td></tr></table></figure>
 
       
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjemzp43d0003ek4gcp9ms00g" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjeod1arp0001cc4giomooixg" class="article-share-link">Teilen</a>
       
       
     </footer>
