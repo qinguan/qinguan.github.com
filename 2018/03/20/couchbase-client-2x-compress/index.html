@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Couchbase client 2.x 自定义压缩支持 | QINGUAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Couchbase client 2.x存储对象主要以Json格式的Document为主。为了支持N1QL查询特性，除了LegacyDocument，client内部其它定义的Document均都未支持数据压缩功能。 12345678910111213/** * This document is fully compatible with Java SDK 1.* stored documents">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Couchbase client 2.x 自定义压缩支持">
+<meta property="og:url" content="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/index.html">
+<meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="Couchbase client 2.x存储对象主要以Json格式的Document为主。为了支持N1QL查询特性，除了LegacyDocument，client内部其它定义的Document均都未支持数据压缩功能。 12345678910111213/** * This document is fully compatible with Java SDK 1.* stored documents">
+<meta property="og:updated_time" content="2018-03-20T14:37:14.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Couchbase client 2.x 自定义压缩支持">
+<meta name="twitter:description" content="Couchbase client 2.x存储对象主要以Json格式的Document为主。为了支持N1QL查询特性，除了LegacyDocument，client内部其它定义的Document均都未支持数据压缩功能。 12345678910111213/** * This document is fully compatible with Java SDK 1.* stored documents">
+  
+    <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">QINGUAN</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-couchbase-client-2x-compress" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/20/couchbase-client-2x-compress/" class="article-date">
+  <time datetime="2018-03-20T13:55:27.000Z" itemprop="datePublished">2018-03-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Couchbase client 2.x 自定义压缩支持
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Couchbase client 2.x存储对象主要以Json格式的Document为主。<br>为了支持N1QL查询特性，除了LegacyDocument，client内部其它定义的Document均都未支持数据压缩功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * This document is fully compatible with Java SDK 1.* stored documents.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * It is not compatible with other SDKs. It should be used to interact with legacy documents and code, but it is</span></span><br><span class="line"><span class="comment"> * recommended to switch to the unifying document types (Json* and String) if possible to guarantee better</span></span><br><span class="line"><span class="comment"> * interoperability in the future.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> Michael Nitschinger</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@since</span> 2.0</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LegacyDocument</span> <span class="keyword">extends</span> <span class="title">AbstractDocument</span>&lt;<span class="title">Object</span>&gt; </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如上面Java doc说明，LegacyDocument是兼容了1.x版本的Java SDK。<br>所以LegacyDocument势必要支持数据压缩功能，它的压缩机制是通过LegacyTranscoder实现的。</p>
+<p>LegacyTranscoder中有两个方法：doEncode和doDecode。<br>顾名思义，doEncode实现了序列化编码功能，而doDecode实现了序列化解码功能。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LegacyTranscoder</span> <span class="keyword">extends</span> <span class="title">AbstractTranscoder</span>&lt;<span class="title">LegacyDocument</span>, <span class="title">Object</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_COMPRESSION_THRESHOLD = <span class="number">16384</span>;</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> compressionThreshold;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LegacyTranscoder</span><span class="params">(<span class="keyword">int</span> compressionThreshold)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.compressionThreshold = compressionThreshold;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Tuple2&lt;ByteBuf, Integer&gt; <span class="title">doEncode</span><span class="params">(LegacyDocument document)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> flags = <span class="number">0</span>;</span><br><span class="line">        Object content = document.content();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> isJson = <span class="keyword">false</span>;</span><br><span class="line">        ByteBuf encoded;</span><br><span class="line">        <span class="keyword">if</span> (content <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">            String c = (String) content;</span><br><span class="line">            isJson = isJsonObject(c);</span><br><span class="line">            encoded = TranscoderUtils.encodeStringAsUtf8(c);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            encoded = Unpooled.buffer();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Long) &#123;</span><br><span class="line">                flags |= SPECIAL_LONG;</span><br><span class="line">                encoded.writeBytes(encodeNum((Long) content, <span class="number">8</span>));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Integer) &#123;</span><br><span class="line">                flags |= SPECIAL_INT;</span><br><span class="line">                encoded.writeBytes(encodeNum((Integer) content, <span class="number">4</span>));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Boolean) &#123;</span><br><span class="line">                flags |= SPECIAL_BOOLEAN;</span><br><span class="line">                <span class="keyword">boolean</span> b = (Boolean) content;</span><br><span class="line">                encoded = Unpooled.buffer().writeByte(b ? <span class="string">'1'</span> : <span class="string">'0'</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Date) &#123;</span><br><span class="line">                flags |= SPECIAL_DATE;</span><br><span class="line">                encoded.writeBytes(encodeNum(((Date) content).getTime(), <span class="number">8</span>));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Byte) &#123;</span><br><span class="line">                flags |= SPECIAL_BYTE;</span><br><span class="line">                encoded.writeByte((Byte) content);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Float) &#123;</span><br><span class="line">                flags |= SPECIAL_FLOAT;</span><br><span class="line">                encoded.writeBytes(encodeNum(Float.floatToRawIntBits((Float) content), <span class="number">4</span>));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> Double) &#123;</span><br><span class="line">                flags |= SPECIAL_DOUBLE;</span><br><span class="line">                encoded.writeBytes(encodeNum(Double.doubleToRawLongBits((Double) content), <span class="number">8</span>));</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (content <span class="keyword">instanceof</span> <span class="keyword">byte</span>[]) &#123;</span><br><span class="line">                flags |= SPECIAL_BYTEARRAY;</span><br><span class="line">                encoded.writeBytes((<span class="keyword">byte</span>[]) content);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                flags |= SERIALIZED;</span><br><span class="line">                encoded.writeBytes(serialize(content));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!isJson &amp;&amp; encoded.readableBytes() &gt;= compressionThreshold) &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] compressed = compress(encoded.copy().array());</span><br><span class="line">            <span class="keyword">if</span> (compressed.length &lt; encoded.array().length) &#123;</span><br><span class="line">                encoded.clear().writeBytes(compressed);</span><br><span class="line">                flags |= COMPRESSED;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Tuple.create(encoded, flags);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里有一个注意点:<br>doEncode默认是不支持JSON格式的字符串进行压缩的。<br>如上述代码描述的，若存储内容是一个字符串，它会优先判断是不是JSON格式的字符串，若是，则设置isJson为true，后续流程就跳过了压缩逻辑。</p>
+<p><strong> 因此，若要支持JSON格式的字符串压缩，一种可选的方案是，使用LegacyDocument，重写LegacyTranscoder，覆盖doEncode逻辑，去掉对JSON字符串的判断处理。</strong></p>
+<p>此外，在调用CLUSTER.openBucket方法时，使用类似如下包含transcoders签名参数的方法，将自定义的transcoder传入。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Bucket <span class="title">openBucket</span><span class="params">(String name, List&lt;Transcoder&lt;? extends Document, ?&gt;&gt; transcoders)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>另外一点:<br>LegacyTranscoder默认设置了压缩阈值16k，即存储内容大小达到16k以后才会压缩。这对有些使用场景来说，阈值设置太大了。<br>由于compressionThreshold字段是私有的，因此，若需要调整阈值，可选的办法:</p>
+<ol>
+<li>继承LegacyTranscoder，在构造方法中重新给compressionThreshold赋值。</li>
+<li>如处理压缩逻辑一样，直接继承AbstractTranscoder，重写LegacyTranscoder。</li>
+</ol>
+<p>关于非JSON Document的存储，详情可以进一步参考<a href="https://developer.couchbase.com/documentation/server/5.1/sdk/nonjson.html" target="_blank" rel="noopener">Couchbase文档-Non-JSON Documents</a>。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjezrjzmj0001ct4gb1p8ohdz" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/03/11/spring-boot-internal-properties-read/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">Springboot获取内部属性值</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/20/couchbase-client-2x-compress/">Couchbase client 2.x 自定义压缩支持</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/spring-boot-internal-properties-read/">Springboot获取内部属性值</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/jd/">招聘</a>
+          </li>
+        
+          <li>
+            <a href="/2018/03/11/maven-package-with-version-and-timestamp/">Maven打包使用代码版本号和时间戳</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Xu Guojun<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
