@@ -13,7 +13,7 @@
 <meta property="og:url" content="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/index.html">
 <meta property="og:site_name" content="QINGUAN">
 <meta property="og:description" content="nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。   在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 n">
-<meta property="og:updated_time" content="2018-04-12T04:20:47.000Z">
+<meta property="og:updated_time" content="2018-04-12T05:04:50.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于openresty lua使用的一些tips">
 <meta name="twitter:description" content="nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。   在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 n">
@@ -124,6 +124,7 @@
 <li>如果模块变量无法满足，使用共享内存或者分布式缓存</li>
 <li>更多参考 <a href="https://github.com/openresty/lua-nginx-module#lua-variable-scope" target="_blank" rel="noopener">lua-variable-scope</a>、<a href="https://moonbingbing.gitbooks.io/openresty-best-practices/ngx_lua/lua-variable-scope.html" target="_blank" rel="noopener">变量的共享范围</a></li>
 <li><a href="https://github.com/openresty/lua-nginx-module#data-sharing-within-an-nginx-worker" target="_blank" rel="noopener">Data Sharing within an Nginx Worker</a></li>
+<li><a href="https://idndx.com/2018/01/19/data-sharing-in-openresty/" target="_blank" rel="noopener">data-sharing-in-openresty</a></li>
 </ul>
 </li>
 <li><p>不应使用模块级的局部变量以及模块属性，存放任何请求级的数据。否则在 luacodecache 开启时，会造成请求间相互影响和数据竞争，产生不可预知的异常状况。</p>
@@ -138,7 +139,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjfw0n8el0002034guugnvr4s" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjg8v1wr700085es6hc4yqlky" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -168,6 +169,15 @@
   
     
 <nav id="article-nav">
+  
+    <a href="/2018/04/14/lua-pcall-and-xpcall/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          Lua pcall及xpcall函数
+        
+      </div>
+    </a>
   
   
     <a href="/2018/04/08/git-merge-commits-into-one/" id="article-nav-older" class="article-nav-link-wrap">
@@ -210,6 +220,10 @@
       <ul>
         
           <li>
+            <a href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/12/some-tips-about-openresty-lua/">关于openresty lua使用的一些tips</a>
           </li>
         
@@ -223,10 +237,6 @@
         
           <li>
             <a href="/2018/03/20/couchbase-client-2x-compress/">Couchbase client 2.x 自定义压缩支持</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/11/spring-boot-internal-properties-read/">Springboot获取内部属性值</a>
           </li>
         
       </ul>

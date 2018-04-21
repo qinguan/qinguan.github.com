@@ -63,6 +63,81 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-lua-pcall-and-xpcall" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/14/lua-pcall-and-xpcall/" class="article-date">
+  <time datetime="2018-04-14T06:51:40.000Z" itemprop="datePublished">2018-04-14</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Lua应用在一般情况下很少使用到异常错误处理，但有时为了防止模块调用异常、函数调用异常、文件读写异常等一些非关键路径(有重试/容错手段)直接抛出异常，中断执行，会封装这些函数的调用，进行异常捕获。</p>
+<p>Lua的异常捕获主要基于<a href="https://www.lua.org/pil/8.4.html" target="_blank" rel="noopener">pcall</a>及<a href="https://www.lua.org/pil/8.5.html" target="_blank" rel="noopener">xpcall函数</a>。</p>
+<h2 id="pcall函数"><a href="#pcall函数" class="headerlink" title="pcall函数"></a><a href="https://www.gammon.com.au/scripts/doc.php?lua=pcall" target="_blank" rel="noopener">pcall函数</a></h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Summary</span><br><span class="line">Calls a <span class="function"><span class="keyword">function</span> <span class="title">in</span> <span class="title">protected</span> <span class="title">mode</span></span></span><br><span class="line"><span class="function"><span class="title">Prototype</span></span></span><br><span class="line"><span class="function"><span class="title">ok</span>, <span class="title">result</span> [ , <span class="title">result2</span> ...] = <span class="title">pcall</span> <span class="params">(f, arg1, arg2, ...)</span></span></span><br><span class="line"></span><br><span class="line">Description</span><br><span class="line">Calls <span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="title">with</span> <span class="title">the</span> <span class="title">supplied</span> <span class="title">arguments</span> <span class="title">in</span> <span class="title">protected</span> <span class="title">mode</span>. <span class="title">Catches</span> <span class="title">errors</span> <span class="title">and</span> <span class="title">returns</span>:</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">On</span> <span class="title">success</span>:</span></span><br><span class="line"><span class="function"><span class="title">true</span></span></span><br><span class="line"><span class="function"><span class="title">function</span> <span class="title">result</span><span class="params">(s)</span></span> - may be more than one</span><br><span class="line"></span><br><span class="line">On failure:</span><br><span class="line"><span class="literal">false</span></span><br><span class="line"><span class="built_in">error</span> message</span><br></pre></td></tr></table></figure>
+<p>举个简单的例子:<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- 求和</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span><span class="params">(a,b,c)</span></span></span><br><span class="line">    d = a + b + c</span><br><span class="line">    <span class="keyword">return</span> d</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> e = sum(<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">"e:"</span>, e)</span><br><span class="line"><span class="keyword">local</span> h = sum(<span class="string">"ten"</span>, <span class="string">"forty"</span>, <span class="string">"nine"</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">"h:"</span>, h)</span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">e:      <span class="number">60</span></span><br><span class="line">lua: src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'a'</span> (a <span class="built_in">string</span> value)</span><br><span class="line">stack <span class="built_in">traceback</span>:</span><br><span class="line">        src/pcall_test.lua:<span class="number">12</span>: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> '<span class="title">sum</span>'</span></span><br><span class="line"><span class="function">        <span class="title">src</span>/<span class="title">pcall_test.lua</span>:26: <span class="title">in</span> <span class="title">main</span> <span class="title">chunk</span></span></span><br><span class="line"><span class="function">        [<span class="title">C</span>]: <span class="title">in</span> ?</span></span><br></pre></td></tr></table></figure></p>
+<p>如上述代码所示，当sum函数碰到无法处理的字符串输出时，抛出了一个异常，中止了程序运行。</p>
+<p>如果我们期望捕获这种异常，做处理，并继续运行程序，可以如下这样调用：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> f, vrf = <span class="built_in">pcall</span>(sum, <span class="string">"ten"</span>, <span class="string">"twenty"</span>, <span class="string">"thirty"</span>)</span><br><span class="line"><span class="keyword">if</span> f <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">print</span>(vrf)</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"failed to call sum function:"</span> .. vrf)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">failed to call sum <span class="function"><span class="keyword">function</span>:<span class="title">src</span>/<span class="title">pcall_test.lua</span>:12: <span class="title">attempt</span> <span class="title">to</span> <span class="title">perform</span> <span class="title">arithmetic</span> <span class="title">on</span> <span class="title">local</span> '<span class="title">a</span>' <span class="params">(a string value)</span></span></span><br></pre></td></tr></table></figure></p>
+<h2 id="xpcall函数"><a href="#xpcall函数" class="headerlink" title="xpcall函数"></a><a href="https://www.gammon.com.au/scripts/doc.php?lua=xpcall" target="_blank" rel="noopener">xpcall函数</a></h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Summary</span><br><span class="line">Calls a <span class="function"><span class="keyword">function</span> <span class="title">with</span> <span class="title">a</span> <span class="title">custom</span> <span class="title">error</span> <span class="title">handler</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">Prototype</span></span></span><br><span class="line"><span class="function"><span class="title">ok</span>, <span class="title">result</span> = <span class="title">xpcall</span> <span class="params">(f, err)</span></span></span><br><span class="line"></span><br><span class="line">If an <span class="built_in">error</span> occurs <span class="keyword">in</span> f it is caught <span class="keyword">and</span> the <span class="built_in">error</span>-handler <span class="string">'err'</span> is called. Then <span class="built_in">xpcall</span> returns <span class="literal">false</span>, <span class="keyword">and</span> whatever the <span class="built_in">error</span> handler returned.</span><br><span class="line"></span><br><span class="line">If there is no <span class="built_in">error</span> <span class="keyword">in</span> f, <span class="keyword">then</span> <span class="built_in">xpcall</span> returns <span class="literal">true</span>, followed by the <span class="function"><span class="keyword">function</span> <span class="title">results</span> <span class="title">from</span> <span class="title">f</span>.</span></span><br></pre></td></tr></table></figure>
+<p>举个简单的例子:<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">err_handle</span><span class="params">(x)</span></span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"err_handle info:"</span> .. x)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> f, res = <span class="built_in">xpcall</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span></span></span><br><span class="line">    <span class="keyword">return</span> sum(<span class="number">10</span>, <span class="number">20</span>, <span class="string">"a"</span>)</span><br><span class="line"><span class="keyword">end</span> , err_handle)</span><br><span class="line"><span class="built_in">print</span>(f, res)</span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">err_handle info:src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'c'</span> (a <span class="built_in">string</span> value)</span><br><span class="line"><span class="literal">false</span>   <span class="literal">nil</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的err_handle就是定义的一个错误处理函数，当然也可以直接改成debug自带的相关函数，如下debug.traceback：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> f, res = <span class="built_in">xpcall</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span></span></span><br><span class="line">    <span class="keyword">return</span> sum(<span class="number">10</span>, <span class="number">20</span>, <span class="string">"a"</span>)</span><br><span class="line"><span class="keyword">end</span> , <span class="built_in">debug</span>.<span class="built_in">traceback</span>)</span><br><span class="line"><span class="built_in">print</span>(f, res)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- output:</span></span><br><span class="line"><span class="literal">false</span>   src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'c'</span> (a <span class="built_in">string</span> value)</span><br><span class="line">stack <span class="built_in">traceback</span>:</span><br><span class="line">        src/pcall_test.lua:<span class="number">12</span>: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> &lt;<span class="title">src</span>/<span class="title">pcall_test.lua</span>:11&gt;</span></span><br><span class="line"><span class="function">        <span class="params">(...tail calls...)</span></span></span><br><span class="line">        [C]: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> '<span class="title">xpcall</span>'</span></span><br><span class="line"><span class="function">        <span class="title">src</span>/<span class="title">pcall_test.lua</span>:41: <span class="title">in</span> <span class="title">main</span> <span class="title">chunk</span></span></span><br><span class="line"><span class="function">        [<span class="title">C</span>]: <span class="title">in</span> ?</span></span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjg8v1wqs00025es6bvalqq8c" class="article-share-link">Teilen</a>
+      
+      
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-some-tips-about-openresty-lua" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/12/some-tips-about-openresty-lua/" class="article-date">
@@ -122,6 +197,7 @@
 <li>如果模块变量无法满足，使用共享内存或者分布式缓存</li>
 <li>更多参考 <a href="https://github.com/openresty/lua-nginx-module#lua-variable-scope" target="_blank" rel="noopener">lua-variable-scope</a>、<a href="https://moonbingbing.gitbooks.io/openresty-best-practices/ngx_lua/lua-variable-scope.html" target="_blank" rel="noopener">变量的共享范围</a></li>
 <li><a href="https://github.com/openresty/lua-nginx-module#data-sharing-within-an-nginx-worker" target="_blank" rel="noopener">Data Sharing within an Nginx Worker</a></li>
+<li><a href="https://idndx.com/2018/01/19/data-sharing-in-openresty/" target="_blank" rel="noopener">data-sharing-in-openresty</a></li>
 </ul>
 </li>
 <li><p>不应使用模块级的局部变量以及模块属性，存放任何请求级的数据。否则在 luacodecache 开启时，会造成请求间相互影响和数据竞争，产生不可预知的异常状况。</p>
@@ -136,7 +212,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjfw0n8el0002034guugnvr4s" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjg8v1wr700085es6hc4yqlky" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -212,7 +288,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjfw0n8en0003034go109bqpl" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjg8v1wql00005es6ynb34jou" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -280,7 +356,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjfw0n8es0007034gyolxz3st" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjg8v1wra000a5es65er2rigd" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -359,7 +435,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjfw0n8eg0000034g7cu9jtwf" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjg8v1wqq00015es68t8c48wv" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -448,7 +524,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjfw0n8er0006034gidu2q60k" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjg8v1wr600075es6zny9fofn" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -530,7 +606,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjfw0n8ep0004034gra7jqe3k" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjg8v1wr300055es6vypmshlr" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -607,7 +683,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjfw0n8eq0005034gepzgpllr" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjg8v1wr400065es6qqwrlt72" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -671,6 +747,10 @@
       <ul>
         
           <li>
+            <a href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/12/some-tips-about-openresty-lua/">关于openresty lua使用的一些tips</a>
           </li>
         
@@ -684,10 +764,6 @@
         
           <li>
             <a href="/2018/03/20/couchbase-client-2x-compress/">Couchbase client 2.x 自定义压缩支持</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/11/spring-boot-internal-properties-read/">Springboot获取内部属性值</a>
           </li>
         
       </ul>
