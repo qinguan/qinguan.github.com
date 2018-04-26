@@ -52,7 +52,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
@@ -62,6 +62,80 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-sql-with-null" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/26/sql-with-null/" class="article-date">
+  <time datetime="2018-04-26T11:22:16.000Z" itemprop="datePublished">2018-04-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/26/sql-with-null/">SQL语句中的NULL判断</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天在写SQL过滤条件时，有个URL判空逻辑，想当然的写成了如下格式:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> != <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
+<p>然而，明明有符合条件的数据，但查询结果并没有出现。问题在哪呢？<br>检索了一下，发现SQL语句中针对NULL的处理逻辑有些特殊。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NULL表示一个未知的值，不能与任何类型的数据进行比较。如果进行了比较，则比较结果依然是NULL，而不是True或者False。</span><br></pre></td></tr></table></figure>
+<p>那如何判断呢？答案是，使用is NULL 或者 is not  NULL。<br>上面的SQL语句改成如下即可。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
+<p>MySQL手册还给了几个比较典型的case，有助于进一步理解:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 IS NULL, 1 IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">| 1 IS NULL | 1 IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">|         0 |             1 |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 = NULL, 1 &lt;&gt; NULL, 1 &lt; NULL, 1 &gt; NULL;</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">| 1 = NULL | 1 &lt;&gt; NULL | 1 &lt; NULL | 1 &gt; NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">|     NULL |      NULL |     NULL |     NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 0 IS NULL, 0 IS NOT NULL, '' IS NULL, '' IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">| 0 IS NULL | 0 IS NOT NULL | '' IS NULL | '' IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">|         0 |             1 |          0 |              1 |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>完整说明请参考<a href="https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html" target="_blank" rel="noopener">MySQL手册-Working with NULL Values</a>。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjgggsxoa0007044g7kkof479" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
   
     <article id="post-lua-pcall-and-xpcall" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -105,7 +179,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjg8v1wqs00025es6bvalqq8c" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjgggsxo60003044gxin3eqy9" class="article-share-link">Share</a>
       
       
     </footer>
@@ -212,7 +286,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjg8v1wr700085es6hc4yqlky" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjgggsxoc0008044gfaaa9049" class="article-share-link">Share</a>
       
       
     </footer>
@@ -288,7 +362,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjg8v1wql00005es6ynb34jou" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjgggsxnv0001044g4t8fpcoy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -356,7 +430,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjg8v1wra000a5es65er2rigd" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjgggsxod0009044gt44gxgs9" class="article-share-link">Share</a>
       
       
     </footer>
@@ -435,7 +509,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjg8v1wqq00015es68t8c48wv" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjgggsxnq0000044gtulxzbvm" class="article-share-link">Share</a>
       
       
     </footer>
@@ -524,7 +598,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjg8v1wr600075es6zny9fofn" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjgggsxoe000a044grd5idgli" class="article-share-link">Share</a>
       
       
     </footer>
@@ -606,7 +680,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjg8v1wr300055es6vypmshlr" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjgggsxnx0002044gem7y88nr" class="article-share-link">Share</a>
       
       
     </footer>
@@ -683,7 +757,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjg8v1wr400065es6qqwrlt72" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjgggsxo90006044gxnj22lwo" class="article-share-link">Share</a>
       
       
     </footer>
@@ -726,13 +800,27 @@
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archiv</h3>
+    <h3 class="widget-title">Archives</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
@@ -742,9 +830,13 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">letzter Beitrag</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/04/26/sql-with-null/">SQL语句中的NULL判断</a>
+          </li>
         
           <li>
             <a href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
@@ -760,10 +852,6 @@
         
           <li>
             <a href="/2018/04/07/tools-for-build-a-website/">个人站点工具集锦</a>
-          </li>
-        
-          <li>
-            <a href="/2018/03/20/couchbase-client-2x-compress/">Couchbase client 2.x 自定义压缩支持</a>
           </li>
         
       </ul>
