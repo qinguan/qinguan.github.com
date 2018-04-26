@@ -52,7 +52,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
@@ -95,14 +95,14 @@
 <p>然而，明明有符合条件的数据，但查询结果并没有出现。问题在哪呢？<br>检索了一下，发现SQL语句中针对NULL的处理逻辑有些特殊。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NULL表示一个未知的值，不能与任何类型的数据进行比较。如果进行了比较，则比较结果依然是NULL，而不是True或者False。</span><br></pre></td></tr></table></figure>
 <p>那如何判断呢？答案是，使用is NULL 或者 is not  NULL。<br>上面的SQL语句改成如下即可。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
-<p>MySQL手册还给了几个比较典型的case，有助于进一步理解:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 IS NULL, 1 IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">| 1 IS NULL | 1 IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">|         0 |             1 |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 = NULL, 1 &lt;&gt; NULL, 1 &lt; NULL, 1 &gt; NULL;</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">| 1 = NULL | 1 &lt;&gt; NULL | 1 &lt; NULL | 1 &gt; NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">|     NULL |      NULL |     NULL |     NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 0 IS NULL, 0 IS NOT NULL, '' IS NULL, '' IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">| 0 IS NULL | 0 IS NOT NULL | '' IS NULL | '' IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">|         0 |             1 |          0 |              1 |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>MySQL手册还给了几个比较典型的case，有助于进一步理解:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT 1 IS NULL, 1 IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">| 1 IS NULL | 1 IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">|         0 |             1 |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 = NULL, 1 &lt;&gt; NULL, 1 &lt; NULL, 1 &gt; NULL;</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">| 1 = NULL | 1 &lt;&gt; NULL | 1 &lt; NULL | 1 &gt; NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">|     NULL |      NULL |     NULL |     NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 0 IS NULL, 0 IS NOT NULL, '' IS NULL, '' IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">| 0 IS NULL | 0 IS NOT NULL | '' IS NULL | '' IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">|         0 |             1 |          0 |              1 |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br></pre></td></tr></table></figure></p>
 <p>完整说明请参考<a href="https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html" target="_blank" rel="noopener">MySQL手册-Working with NULL Values</a>。</p>
 
       
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjgggsxoa0007044g7kkof479" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjggh3yi6000n4w4gvfelmu0e" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
@@ -179,9 +179,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjgggsxo60003044gxin3eqy9" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjggh3yhk00034w4gosk5jae4" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li></ul>
+
     </footer>
   </div>
 
@@ -286,9 +288,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjgggsxoc0008044gfaaa9049" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjggh3yhm00054w4gptjdtqi2" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
+
     </footer>
   </div>
 
@@ -362,9 +366,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjgggsxnv0001044g4t8fpcoy" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjggh3yhg00014w4ghdjbh50r" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
+
     </footer>
   </div>
 
@@ -430,9 +436,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjgggsxod0009044gt44gxgs9" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjggh3yhq000b4w4g07o04uo7" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/">other</a></li></ul>
+
     </footer>
   </div>
 
@@ -509,9 +517,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjgggsxnq0000044gtulxzbvm" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjggh3yhb00004w4g7vgcf3jw" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Couchbase/">Couchbase</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
     </footer>
   </div>
 
@@ -598,9 +608,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjgggsxoe000a044grd5idgli" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjggh3yhn00084w4gnr0fphox" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Springboot/">Springboot</a></li></ul>
+
     </footer>
   </div>
 
@@ -680,7 +692,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjgggsxnx0002044gem7y88nr" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjggh3yhp00094w4gq276442t" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -757,9 +769,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjgggsxo90006044gxnj22lwo" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjggh3yhl00044w4gwxgijbn1" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
+
     </footer>
   </div>
 
@@ -803,7 +817,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Couchbase/">Couchbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
     </div>
   </div>
 
@@ -813,14 +827,14 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a>
+      <a href="/tags/Couchbase/" style="font-size: 10px;">Couchbase</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archiv</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
@@ -830,7 +844,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">letzter Beitrag</h3>
     <div class="widget">
       <ul>
         

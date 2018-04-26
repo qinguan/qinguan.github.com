@@ -8,12 +8,13 @@
   <title>关于openresty lua使用的一些tips | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。   在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 n">
+<meta name="keywords" content="Lua,OpenResty">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于openresty lua使用的一些tips">
 <meta property="og:url" content="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/index.html">
 <meta property="og:site_name" content="QINGUAN">
 <meta property="og:description" content="nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。   在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 n">
-<meta property="og:updated_time" content="2018-04-12T05:04:50.000Z">
+<meta property="og:updated_time" content="2018-04-26T11:58:32.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于openresty lua使用的一些tips">
 <meta name="twitter:description" content="nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。   在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 n">
@@ -56,7 +57,7 @@
         
           <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
@@ -139,9 +140,11 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjgggsxoc0008044gfaaa9049" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjggh3yhm00054w4gptjdtqi2" class="article-share-link">Teilen</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
+
     </footer>
   </div>
 
@@ -171,7 +174,7 @@
 <nav id="article-nav">
   
     <a href="/2018/04/14/lua-pcall-and-xpcall/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
+      <strong class="article-nav-caption">Neuer</strong>
       <div class="article-nav-title">
         
           Lua pcall及xpcall函数
@@ -181,7 +184,7 @@
   
   
     <a href="/2018/04/08/git-merge-commits-into-one/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Older</strong>
+      <strong class="article-nav-caption">Älter</strong>
       <div class="article-nav-title">Git 合并分支多个commits</div>
     </a>
   
@@ -202,7 +205,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Couchbase/">Couchbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
     </div>
   </div>
 
@@ -212,14 +215,14 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/SQL/" style="font-size: 10px;">SQL</a>
+      <a href="/tags/Couchbase/" style="font-size: 10px;">Couchbase</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
+    <h3 class="widget-title">Archiv</h3>
     <div class="widget">
       <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
@@ -229,7 +232,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
+    <h3 class="widget-title">letzter Beitrag</h3>
     <div class="widget">
       <ul>
         
