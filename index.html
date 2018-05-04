@@ -63,6 +63,132 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-slf4j-stackoverflowerror" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/04/slf4j-stackoverflowerror/" class="article-date">
+  <time datetime="2018-05-04T06:47:34.000Z" itemprop="datePublished">2018-05-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/04/slf4j-stackoverflowerror/">SLF4J及日志栈溢出问题</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>新接手一项目，在本地测试运行时，发现报如下错误:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the <span class="class"><span class="keyword">class</span> <span class="title">path</span>, <span class="title">preempting</span> <span class="title">StackOverflowError</span>.</span></span><br></pre></td></tr></table></figure></p>
+<p>很明显，是项目的classpath中同时存在log4j-over-slf4j.jar和slf4j-log4j12.jar，引起死循环。但为什么项目在线上能好好运行呢？<br>原来线上运行的程序在打包时做了手脚，在最终的依赖包中，删除了log4j和slf4j-log4j12，如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencySets&gt;</span><br><span class="line">    &lt;dependencySet&gt;</span><br><span class="line">        &lt;outputDirectory&gt;lib&lt;/outputDirectory&gt;</span><br><span class="line">        &lt;excludes&gt;</span><br><span class="line">            &lt;exclude&gt;log4j:log4j&lt;/exclude&gt;</span><br><span class="line">            &lt;exclude&gt;org.slf4j:slf4j-log4j12&lt;/exclude&gt;</span><br><span class="line">        &lt;/excludes&gt;</span><br><span class="line">        &lt;useProjectArtifact&gt;false&lt;/useProjectArtifact&gt;</span><br><span class="line">    &lt;/dependencySet&gt;</span><br><span class="line">&lt;/dependencySets&gt;</span><br></pre></td></tr></table></figure></p>
+<p>让我们来重头捋一下Java日志框架及该问题的成因。</p>
+<p>我们用的最多的几个日志框架有Log4j、Jakarta Commons Logging以及Logback-classic。尤其值得一提的是Logback-classic，它是Log4j作者写的有一个开源日志组件。</p>
+<p><a href="https://www.slf4j.org/index.html" target="_blank" rel="noopener">SLF4J</a>，全称Simple Logging Facade for Java，是一个抽象的日志框架，支持程序动态绑定日志框架实现，如绑定到<code>java.util.logging</code>、<code>logback</code>以及 <code>log4j</code>等，使用时需要在应用中添加依赖slf4j-api。</p>
+<p><strong>SLF4J对应用日志做了封装抽象，因此，业务可以针对SLF4J进行编程，再按需绑定具体的日志框架。无论是灵活性还是可扩展性，都有很多的提升。</strong></p>
+<p>为了支持动态绑定不同的日志框架，SLF4J提供了几个jar，如下：</p>
+<ol>
+<li><strong>slf4j-log4j12</strong>：Log4j绑定，Log4j是一个使用非常广泛的日志组件。</li>
+<li><strong>slf4j-jcl</strong>: Jakarta Commons Logging绑定。</li>
+<li><strong>slf4j-jdk14</strong>: java.util.logging, JDK绑定。</li>
+<li><strong>slf4j-simple</strong>：输出会定向到System.err，只有INFO级别以上的才会输出。</li>
+<li><strong>slf4j-nop</strong>：丢弃日志绑定。<br>此外，Logback-classic，由于实现了SLF4J’s的Logger接口，native，性能优越，可以直接作为SLF4J的实现。</li>
+</ol>
+<p>为了方便jcl、log4j、jul用户迁移到SLF4J，SLF4J提供了几个桥接模块。</p>
+<ol>
+<li><p><strong>log4j-over-slf4j</strong>：针对log4j用户，可以无缝迁移到slf4j。不需要改任何代码，只需要将log4j.jar替换为log4j-over-slf4j.jar。</p>
+<ul>
+<li>实现原理：log4j-over-slf4j直接替换了log4j中的大量同名类，如Logger、Category、Level等。</li>
+</ul>
+</li>
+<li><p><strong>jcl-over-slf4j</strong>：针对jcl用户迁移到slf4j的一种解决方案，只需要将commons-logging.jar替换为jcl-over-slf4j.jar</p>
+<ul>
+<li>实现原理：jcl-over-slf4j保留了jcl的接口，但底层实现采用了slf4j。</li>
+</ul>
+</li>
+<li><p><strong>jul-to-slf4j</strong>：针对java.util.logging用户。</p>
+<ul>
+<li>实现原理：由于jul在java.*namespace下，无法替换。该模块采用了翻译手段，将LogRecord转换为slf4j类似对象。</li>
+<li>注意: 该方案存在一定的性能损失。</li>
+</ul>
+</li>
+</ol>
+<p>按上面的介绍，使用slf4j时就需要注意一下几个问题：</p>
+<ol>
+<li><p><strong><code>jcl-over-slf4j.jar</code>和<code>slf4j-jcl.jar</code>不能同时依赖！</strong></p>
+<ul>
+<li>原因：jcl会将实现委托到slf4j，而slf4j又会绑定到jcl。</li>
+</ul>
+</li>
+<li><p><strong><code>log4j-over-slf4j.jar</code>和<code>slf4j-log4j12.jar</code>不能同时依赖！</strong></p>
+<ul>
+<li>原因: log4j会将实现委托到slf4j，而slf4j又会绑定到log4j实现。</li>
+</ul>
+</li>
+<li><p><strong><code>jul-to-slf4j.jar</code>和<code>slf4j-jdk14.jar</code>不能同时依赖！</strong></p>
+<ul>
+<li>原因：jul会将实现委托到slf4j，而slf4j又会绑定到jdk实现。</li>
+</ul>
+</li>
+</ol>
+<p><strong>上述三个情况下，若同时依赖均会产生循环依赖问题，导致StackOverflowError!</strong></p>
+<p>回到开头的问题，即上述第2个注意问题，怎么解决也已经很明显了。</p>
+<p><strong>参考资料</strong></p>
+<ol>
+<li><a href="https://www.slf4j.org/manual.html" target="_blank" rel="noopener">SLF4J user manual</a></li>
+<li><a href="https://www.slf4j.org/legacy.html" target="_blank" rel="noopener">Bridging legacy APIs</a></li>
+</ol>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjgrrelq700070t4gqym5mbp8" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SLF4J/">SLF4J</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-sql-with-null" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/26/sql-with-null/" class="article-date">
@@ -102,11 +228,83 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjgghl8f7000aba4gzof0kt0z" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjgrrelqg000e0t4gqb1uwwef" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
 
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
+    <article id="post-lua-syntax-sugar" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/21/lua-syntax-sugar/" class="article-date">
+  <time datetime="2018-04-21T04:04:37.000Z" itemprop="datePublished">2018-04-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/21/lua-syntax-sugar/">lua-syntax-sugar</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> _M = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span></span></span><br></pre></td></tr></table></figure>
+<p><a href="http://tylerneylon.com/a/learn-lua/" target="_blank" rel="noopener">http://tylerneylon.com/a/learn-lua/</a></p>
+<p>: 默认传入了self参数</p>
+<p>pcall调用</p>
+<p>访问ip resolver 127.0.0.1 解析慢</p>
+<p><a href="http://lua-users.org/wiki/ColonForMethodCall" target="_blank" rel="noopener">ColonForMethodCall</a></p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/04/21/lua-syntax-sugar/" data-id="cjgrrelq300050t4gwumx0t0j" class="article-share-link">Teilen</a>
+      
+      
     </footer>
   </div>
 
@@ -179,7 +377,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjgghl8f30004ba4ghar7kxuz" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjgrrelqa00090t4g2ueyi3ts" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li></ul>
@@ -288,7 +486,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjgghl8f50007ba4gcydml6ez" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjgrrelqb000a0t4gajme35ae" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
@@ -366,7 +564,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjgghl8f20003ba4gfqnlxoy2" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjgrrelpy00030t4grhxeuuol" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
@@ -436,7 +634,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjgghl8f9000cba4g5irvwnzi" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjgrrelqj000h0t4gpmi8j755" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/">other</a></li></ul>
@@ -517,7 +715,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjgghl8eu0000ba4gw4b350pa" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjgrrelpw00020t4ghwdggfna" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NoSQL/">NoSQL</a></li></ul>
@@ -608,7 +806,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjgghl8f60008ba4gl3h1cbxm" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjgrrelqf000c0t4gaw20kyw1" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Springboot/">Springboot</a></li></ul>
@@ -692,7 +890,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjgghl8ey0001ba4gcjm83q87" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjgrrelpr00000t4g8qa71koj" class="article-share-link">Teilen</a>
       
       
     </footer>
@@ -725,86 +923,12 @@
 
 
   
-    <article id="post-maven-package-with-version-and-timestamp" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/03/11/maven-package-with-version-and-timestamp/" class="article-date">
-  <time datetime="2018-03-11T12:35:10.000Z" itemprop="datePublished">2018-03-11</time>
-</a>
+
+
+  <nav id="page-nav">
     
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/03/11/maven-package-with-version-and-timestamp/">Maven打包使用代码版本号和时间戳</a>
-    </h1>
-  
-
-	<br/>
-        <div>
-	<span id="busuanzi_container_page_pv" style='display:none'>
-	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
-	</span>
-	</div>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>为了显示区分部署代码版本，一般会在打包的时候带上SVN/Git版本号，如果是多机房部署的，还需要带上机房标签。</p>
-<p>若代码发布在Git仓库，可以使用maven插件<a href="https://github.com/ktoso/maven-git-commit-id-plugin" target="_blank" rel="noopener">git-commit-id-plugin</a>。<br>该插件会产生一个git.properties文件，并被包含进最终的jar文件中。<br>简单配置如下：</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">       &lt;groupId&gt;pl.project13.maven&lt;/groupId&gt;</span><br><span class="line">       &lt;artifactId&gt;git-commit-id-plugin&lt;/artifactId&gt;</span><br><span class="line">       &lt;version&gt;2.2.4&lt;/version&gt;</span><br><span class="line">       &lt;executions&gt;</span><br><span class="line">           &lt;execution&gt;</span><br><span class="line">               &lt;goals&gt;</span><br><span class="line">                   &lt;goal&gt;revision&lt;/goal&gt;</span><br><span class="line">               &lt;/goals&gt;</span><br><span class="line">           &lt;/execution&gt;</span><br><span class="line">       &lt;/executions&gt;</span><br><span class="line">       &lt;configuration&gt;</span><br><span class="line">           &lt;!-- 使properties扩展到整个maven bulid 周期</span><br><span class="line">           Ref: https:<span class="comment">//github.com/ktoso/maven-git-commit-id-plugin/issues/280 --&gt;</span></span><br><span class="line">           &lt;injectAllReactorProjects&gt;true&lt;/injectAllReactorProjects&gt;</span><br><span class="line">           &lt;!--日期格式;默认值:dd.MM.yyyy <span class="string">'@'</span> HH:mm:ss z;--&gt;</span><br><span class="line">           &lt;dateFormat&gt;yyyyMMddHHmmss&lt;/dateFormat&gt;</span><br><span class="line">           &lt;!--,构建过程中,是否打印详细信息;默认值:<span class="keyword">false</span>;--&gt;</span><br><span class="line">           &lt;verbose&gt;true&lt;/verbose&gt;</span><br><span class="line">           &lt;!--是否生成<span class="string">"git.properties"</span>文件;默认值:<span class="keyword">false</span>;--&gt;</span><br><span class="line">           &lt;generateGitPropertiesFile&gt;true&lt;/generateGitPropertiesFile&gt;</span><br><span class="line">           &lt;!-- <span class="string">".git"</span>文件路径;默认值:$&#123;project.basedir&#125;/.git; ..表示上一级--&gt;</span><br><span class="line">           &lt;dotGitDirectory&gt;$&#123;project.basedir&#125;/../.git&lt;/dotGitDirectory&gt;</span><br><span class="line">           &lt;gitDescribe&gt;</span><br><span class="line">               &lt;!--提交操作ID显式字符长度,最大值为:<span class="number">40</span>;默认值:<span class="number">7</span>;<span class="number">0</span>代表特殊意义;--&gt;</span><br><span class="line">               &lt;abbrev&gt;7&lt;/abbrev&gt;</span><br><span class="line">               &lt;!--构建触发时,代码有修改时(即<span class="string">"dirty state"</span>),添加指定后缀;默认值:<span class="string">""</span>;--&gt;</span><br><span class="line">               &lt;dirty&gt;-dirty&lt;/dirty&gt;</span><br><span class="line">           &lt;/gitDescribe&gt;</span><br><span class="line">       &lt;/configuration&gt;</span><br><span class="line">   &lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-<p>项目module可以配置打包的finalName如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;finalName&gt;</span><br><span class="line">	project-<span class="keyword">module</span>-$&#123;dc&#125;-$&#123;git.commit.id.abbrev&#125;-$&#123;git.build.time&#125;</span><br><span class="line">&lt;/finalName&gt;</span><br></pre></td></tr></table></figure></p>
-<p>其中git.commit.id.abbre是提交Git仓库时的版本号缩写，git.build.time顾名思义是打包时间。</p>
-<p>对应的maven打包命令如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mvn clean <span class="keyword">package</span> -Dmaven.test.skip=<span class="keyword">true</span> -Ddc=$dc -P $dc</span><br></pre></td></tr></table></figure>
-<p>若有多机房信息，为方便配置，一般会将profile配置成机房编码，这样上面的机房dc参数和项目profile参数即可以共享同一个参数值。</p>
-<p>打包时间还可以通过另外一个maven插件<a href="http://www.mojohaus.org/build-helper-maven-plugin/" target="_blank" rel="noopener">build-helper-maven-plugin</a>读取。</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;plugin&gt;</span><br><span class="line">      &lt;groupId&gt;org.codehaus.mojo&lt;/groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;build-helper-maven-plugin&lt;/artifactId&gt;</span><br><span class="line">      &lt;version&gt;3.0.0&lt;/version&gt;</span><br><span class="line">      &lt;executions&gt;</span><br><span class="line">          &lt;execution&gt;</span><br><span class="line">              &lt;id&gt;timestamp-property&lt;/id&gt;</span><br><span class="line">              &lt;goals&gt;</span><br><span class="line">                  &lt;goal&gt;timestamp-property&lt;/goal&gt;</span><br><span class="line">              &lt;/goals&gt;</span><br><span class="line">          &lt;/execution&gt;</span><br><span class="line">      &lt;/executions&gt;</span><br><span class="line">      &lt;configuration&gt;</span><br><span class="line">          &lt;name&gt;current.time&lt;/name&gt;</span><br><span class="line">          &lt;pattern&gt;yyyyMMddHHmmss&lt;/pattern&gt;</span><br><span class="line">          &lt;timeZone&gt;GMT+8&lt;/timeZone&gt;</span><br><span class="line">      &lt;/configuration&gt;</span><br><span class="line">  &lt;/plugin&gt;</span><br></pre></td></tr></table></figure>
-<p>上述current.time字段值即是打包时间，可以被pom文件引用。</p>
-
-      
-    </div>
-
-    <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjgghl8f40005ba4gfuvhkme9" class="article-share-link">Teilen</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
-
-    </footer>
-  </div>
-
-<div id="disqus_thread"></div>
-<script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-  
-</article>
-
-
-
-  
-
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">weiter &raquo;</a>
+  </nav>
 
 </section>
         
@@ -817,7 +941,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
     </div>
   </div>
 
@@ -827,7 +951,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+      <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
@@ -836,7 +960,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archiv</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li></ul>
     </div>
   </div>
 
@@ -849,7 +973,15 @@
       <ul>
         
           <li>
+            <a href="/2018/05/04/slf4j-stackoverflowerror/">SLF4J及日志栈溢出问题</a>
+          </li>
+        
+          <li>
             <a href="/2018/04/26/sql-with-null/">SQL语句中的NULL判断</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/21/lua-syntax-sugar/">lua-syntax-sugar</a>
           </li>
         
           <li>
@@ -858,14 +990,6 @@
         
           <li>
             <a href="/2018/04/12/some-tips-about-openresty-lua/">关于openresty lua使用的一些tips</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/08/git-merge-commits-into-one/">Git 合并分支多个commits</a>
-          </li>
-        
-          <li>
-            <a href="/2018/04/07/tools-for-build-a-website/">个人站点工具集锦</a>
           </li>
         
       </ul>
