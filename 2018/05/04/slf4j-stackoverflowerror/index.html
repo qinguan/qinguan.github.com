@@ -14,7 +14,7 @@
 <meta property="og:url" content="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/index.html">
 <meta property="og:site_name" content="QINGUAN">
 <meta property="og:description" content="新接手一项目，在本地测试运行时，发现报如下错误:1Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError. 很明显，是项目的classpath中同时存在log4j-over-slf4j.jar和slf4j-log4j12.jar，引起死循环。但">
-<meta property="og:updated_time" content="2018-05-04T09:30:32.000Z">
+<meta property="og:updated_time" content="2018-05-04T09:52:57.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SLF4J及日志栈溢出问题">
 <meta name="twitter:description" content="新接手一项目，在本地测试运行时，发现报如下错误:1Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the class path, preempting StackOverflowError. 很明显，是项目的classpath中同时存在log4j-over-slf4j.jar和slf4j-log4j12.jar，引起死循环。但">
@@ -97,36 +97,71 @@
         <p>新接手一项目，在本地测试运行时，发现报如下错误:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Detected both log4j-over-slf4j.jar AND slf4j-log4j12.jar on the <span class="class"><span class="keyword">class</span> <span class="title">path</span>, <span class="title">preempting</span> <span class="title">StackOverflowError</span>.</span></span><br></pre></td></tr></table></figure></p>
 <p>很明显，是项目的classpath中同时存在log4j-over-slf4j.jar和slf4j-log4j12.jar，引起死循环。但为什么项目在线上能好好运行呢？<br>原来线上运行的程序在打包时做了手脚，在最终的依赖包中，删除了log4j和slf4j-log4j12，如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependencySets&gt;</span><br><span class="line">    &lt;dependencySet&gt;</span><br><span class="line">        &lt;outputDirectory&gt;lib&lt;/outputDirectory&gt;</span><br><span class="line">        &lt;excludes&gt;</span><br><span class="line">            &lt;exclude&gt;log4j:log4j&lt;/exclude&gt;</span><br><span class="line">            &lt;exclude&gt;org.slf4j:slf4j-log4j12&lt;/exclude&gt;</span><br><span class="line">        &lt;/excludes&gt;</span><br><span class="line">        &lt;useProjectArtifact&gt;false&lt;/useProjectArtifact&gt;</span><br><span class="line">    &lt;/dependencySet&gt;</span><br><span class="line">&lt;/dependencySets&gt;</span><br></pre></td></tr></table></figure></p>
 <p>让我们来重头捋一下Java日志框架及该问题的成因。</p>
-<p>我们用的最多的几个日志框架有Log4j、Jakarta Commons Logging以及Logback-classic。尤其值得一提的是Logback-classic，它是Log4j作者写的有一个开源日志组件。</p>
+<p>我们用的最多的几个日志框架有Log4j、Jakarta Commons Logging以及Logback-classic。尤其值得一提的是Logback-classic，它是Log4j作者写的有一个开源日志组件，由于实现了SLF4J’s的Logger接口，native，性能优越，可以直接作为SLF4J的实现。</p>
 <p><a href="https://www.slf4j.org/index.html" target="_blank" rel="noopener">SLF4J</a>，全称Simple Logging Facade for Java，是一个抽象的日志框架，支持程序动态绑定日志框架实现，如绑定到<code>java.util.logging</code>、<code>logback</code>以及 <code>log4j</code>等，使用时需要在应用中添加依赖slf4j-api。</p>
 <p><strong>SLF4J对应用日志做了封装抽象，因此，业务可以针对SLF4J进行编程，再按需绑定具体的日志框架。无论是灵活性还是可扩展性，都有很多的提升。</strong></p>
-<p>为了支持动态绑定不同的日志框架，SLF4J提供了几个jar，如下：</p>
-<ol>
-<li><strong>slf4j-log4j12</strong>：Log4j绑定，Log4j是一个使用非常广泛的日志组件。</li>
-<li><strong>slf4j-jcl</strong>: Jakarta Commons Logging绑定。</li>
-<li><strong>slf4j-jdk14</strong>: java.util.logging, JDK绑定。</li>
-<li><strong>slf4j-simple</strong>：输出会定向到System.err，只有INFO级别以上的才会输出。</li>
-<li><strong>slf4j-nop</strong>：丢弃日志绑定。<br>此外，Logback-classic，由于实现了SLF4J’s的Logger接口，native，性能优越，可以直接作为SLF4J的实现。</li>
-</ol>
+<p>为了支持动态绑定不同的日志框架，SLF4J提供了几个绑定工具，如下：</p>
+<table>
+<thead>
+<tr>
+<th>绑定</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>slf4j-log4j12</strong></td>
+<td>Log4j绑定，Log4j是一个使用非常广泛的日志组件</td>
+</tr>
+<tr>
+<td><strong>slf4j-jcl</strong></td>
+<td>Jakarta Commons Logging绑定</td>
+</tr>
+<tr>
+<td><strong>slf4j-jdk14</strong></td>
+<td>java.util.logging, JDK绑定</td>
+</tr>
+<tr>
+<td><strong>slf4j-simple</strong></td>
+<td>输出会定向到System.err，只有INFO级别以上的才会输出</td>
+</tr>
+<tr>
+<td><strong>slf4j-nop</strong></td>
+<td>丢弃日志绑定</td>
+</tr>
+</tbody>
+</table>
 <p>为了方便jcl、log4j、jul用户迁移到SLF4J，SLF4J提供了几个桥接模块。</p>
-<ol>
-<li><p><strong>log4j-over-slf4j</strong>：针对log4j用户，可以无缝迁移到slf4j。不需要改任何代码，只需要将log4j.jar替换为log4j-over-slf4j.jar。</p>
-<ul>
-<li>实现原理：log4j-over-slf4j直接替换了log4j中的大量同名类，如Logger、Category、Level等。</li>
-</ul>
-</li>
-<li><p><strong>jcl-over-slf4j</strong>：针对jcl用户迁移到slf4j的一种解决方案，只需要将commons-logging.jar替换为jcl-over-slf4j.jar</p>
-<ul>
-<li>实现原理：jcl-over-slf4j保留了jcl的接口，但底层实现采用了slf4j。</li>
-</ul>
-</li>
-<li><p><strong>jul-to-slf4j</strong>：针对java.util.logging用户。</p>
-<ul>
-<li>实现原理：由于jul在java.*namespace下，无法替换。该模块采用了翻译手段，将LogRecord转换为slf4j类似对象。</li>
-<li>注意: 该方案存在一定的性能损失。</li>
-</ul>
-</li>
-</ol>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">模块</th>
+<th style="text-align:left">目标对象</th>
+<th style="text-align:left">使用说明</th>
+<th style="text-align:left">实现原理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>log4j-over-slf4j</strong></td>
+<td style="text-align:left">log4j用户</td>
+<td style="text-align:left">将log4j.jar替换为log4j-over-slf4j.jar</td>
+<td style="text-align:left">直接替换了log4j中的大量同名类，如Logger、Category、Level等</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>jcl-over-slf4j</strong></td>
+<td style="text-align:left">jcl用户</td>
+<td style="text-align:left">将commons-logging.jar替换为jcl-over-slf4j.jar</td>
+<td style="text-align:left">保留了jcl的接口，但底层实现采用了slf4j</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>jul-to-slf4j</strong></td>
+<td style="text-align:left">jul用户</td>
+<td style="text-align:left">直接依赖</td>
+<td style="text-align:left">由于jul在java.*namespace下，无法替换。该模块采用了翻译手段，将LogRecord转换为slf4j类似对象。<strong> 该方案存在一定的性能损失，不推荐使用</strong></td>
+</tr>
+</tbody>
+</table>
 <p>按上面的介绍，使用slf4j时就需要注意一下几个问题：</p>
 <ol>
 <li><p><strong><code>jcl-over-slf4j.jar</code>和<code>slf4j-jcl.jar</code>不能同时依赖！</strong></p>
@@ -157,7 +192,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjgrrelq700070t4gqym5mbp8" class="article-share-link">Teilen</a>
+      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjgrrn65y00083k4g8rzzeowo" class="article-share-link">Teilen</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SLF4J/">SLF4J</a></li></ul>
