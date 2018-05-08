@@ -5,14 +5,19 @@
   
 
   
-  <title>Tag: Maven | QINGUAN</title>
+  <title>nginx resolver数据缓存及解析超时时间参数 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="QINGUAN">
-<meta property="og:url" content="http://qinguan.github.io/tags/Maven/index.html">
+  <meta name="description" content="在配置nginx的resolver时，有两个与时间相关的参数。 一、valid123456Syntax: resolver address ... [valid=time] [ipv6=on|off];Default:    —Context:    http, server, location如：resolver 127.0.0.1 [::1]:5353 valid=30s; valid fla">
+<meta name="keywords" content="NGINX">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx resolver数据缓存及解析超时时间参数">
+<meta property="og:url" content="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/index.html">
 <meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="在配置nginx的resolver时，有两个与时间相关的参数。 一、valid123456Syntax: resolver address ... [valid=time] [ipv6=on|off];Default:    —Context:    http, server, location如：resolver 127.0.0.1 [::1]:5353 valid=30s; valid fla">
+<meta property="og:updated_time" content="2018-05-08T08:27:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QINGUAN">
+<meta name="twitter:title" content="nginx resolver数据缓存及解析超时时间参数">
+<meta name="twitter:description" content="在配置nginx的resolver时，有两个与时间相关的参数。 一、valid123456Syntax: resolver address ... [valid=time] [ipv6=on|off];Default:    —Context:    http, server, location如：resolver 127.0.0.1 [::1]:5353 valid=30s; valid fla">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -61,39 +66,92 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2018/03/11/maven-package-with-version-and-timestamp/" class="archive-article-date">
-  <time datetime="2018-03-11T12:35:10.000Z" itemprop="datePublished">Mar 11</time>
+        <section id="main"><article id="post-nginx-resolver-vaild-and-timeout" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/08/nginx-resolver-vaild-and-timeout/" class="article-date">
+  <time datetime="2018-05-08T08:03:18.000Z" itemprop="datePublished">2018-05-08</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/03/11/maven-package-with-version-and-timestamp/">Maven打包使用代码版本号和时间戳</a>
+    <h1 class="article-title" itemprop="name">
+      nginx resolver数据缓存及解析超时时间参数
     </h1>
   
 
-    </header>
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>在配置nginx的resolver时，有两个与时间相关的参数。</p>
+<p>一、valid<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Syntax: resolver address ... [valid=time] [ipv6=on|off];</span><br><span class="line">Default:    —</span><br><span class="line">Context:    http, server, location</span><br><span class="line"></span><br><span class="line">如：</span><br><span class="line">resolver 127.0.0.1 [::1]:5353 valid=30s;</span><br></pre></td></tr></table></figure></p>
+<p><code>valid</code> flag means how long nginx will consider answer from resolver as valid and will not ask resolver for that period.<br>即DNS返回结果的缓存时间，在缓存有效时间内，nginx不会再次向DNS请求解析结果。</p>
+<p>二、resolver_timeout<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Syntax: resolver_timeout time;</span><br><span class="line">Default:    </span><br><span class="line">resolver_timeout 30s;</span><br><span class="line">Context:    http, server, location</span><br></pre></td></tr></table></figure></p>
+<p><code>resolve_timeout</code> sets how long nginx will wait for anwser from resolver (DNS).<br>即nginx发起的DNS查询请求超时时间。</p>
+<p>更多参考：</p>
+<ul>
+<li><a href="http://nginx.org/en/docs/http/ngx_http_core_module.html#resolver" target="_blank" rel="noopener">http://nginx.org/en/docs/http/ngx_http_core_module.html#resolver</a></li>
+<li><a href="https://stackoverflow.com/questions/28606696/what-is-the-difference-in-resolver-valid-time-and-resolver-timeout-in-nginx" target="_blank" rel="noopener">https://stackoverflow.com/questions/28606696/what-is-the-difference-in-resolver-valid-time-and-resolver-timeout-in-nginx</a> </li>
+</ul>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjgxeuspz0006ev4gpi1vlbhg" class="article-share-link">Teilen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NGINX/">NGINX</a></li></ul>
+
+    </footer>
   </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/05/04/slf4j-stackoverflowerror/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">SLF4J及日志栈溢出问题</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>
