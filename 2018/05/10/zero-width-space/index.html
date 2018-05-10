@@ -5,19 +5,20 @@
   
 
   
-  <title>About Me | QINGUAN</title>
+  <title>零宽字符 &lt;200b&gt; | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="XU GUOJUN LIVING @BEIJING WORKING @IQIYI.COM">
-<meta property="og:type" content="website">
-<meta property="og:title" content="About Me">
-<meta property="og:url" content="http://qinguan.github.io/about/index.html">
+  <meta name="description" content="今天配置一个数据库链接地址时，报URL地址有问题，但在sublime Text里明明是正常的。 1http://shgq.1.abc:1234/pools;http://shgq.2.abc:1234/pools#xxf 打开debug日志发现是地址解析错误，无法识别&amp;lt;200b&amp;gt;，但字符串中没有这个&amp;lt;200b&amp;gt;，是哪里冒出来的呢？ 于是，我重新把配置贴到用vim打开的文本中">
+<meta name="keywords" content="Unicode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="零宽字符 &lt;200b&gt;">
+<meta property="og:url" content="http://qinguan.github.io/2018/05/10/zero-width-space/index.html">
 <meta property="og:site_name" content="QINGUAN">
-<meta property="og:description" content="XU GUOJUN LIVING @BEIJING WORKING @IQIYI.COM">
+<meta property="og:description" content="今天配置一个数据库链接地址时，报URL地址有问题，但在sublime Text里明明是正常的。 1http://shgq.1.abc:1234/pools;http://shgq.2.abc:1234/pools#xxf 打开debug日志发现是地址解析错误，无法识别&amp;lt;200b&amp;gt;，但字符串中没有这个&amp;lt;200b&amp;gt;，是哪里冒出来的呢？ 于是，我重新把配置贴到用vim打开的文本中">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-03-20T14:28:33.000Z">
+<meta property="og:updated_time" content="2018-05-10T11:17:18.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="About Me">
-<meta name="twitter:description" content="XU GUOJUN LIVING @BEIJING WORKING @IQIYI.COM">
+<meta name="twitter:title" content="零宽字符 &lt;200b&gt;">
+<meta name="twitter:description" content="今天配置一个数据库链接地址时，报URL地址有问题，但在sublime Text里明明是正常的。 1http://shgq.1.abc:1234/pools;http://shgq.2.abc:1234/pools#xxf 打开debug日志发现是地址解析错误，无法识别&amp;lt;200b&amp;gt;，但字符串中没有这个&amp;lt;200b&amp;gt;，是哪里冒出来的呢？ 于是，我重新把配置贴到用vim打开的文本中">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -66,10 +67,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="page-" class="article article-type-page" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-zero-width-space" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/about/index.html" class="article-date">
-  <time datetime="2018-03-11T14:59:21.000Z" itemprop="datePublished">2018-03-11</time>
+    <a href="/2018/05/10/zero-width-space/" class="article-date">
+  <time datetime="2018-05-10T09:51:38.000Z" itemprop="datePublished">2018-05-10</time>
 </a>
     
   </div>
@@ -80,7 +81,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      About Me
+      零宽字符 &lt;200b&gt;
     </h1>
   
 
@@ -94,18 +95,29 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="XU-GUOJUN"><a href="#XU-GUOJUN" class="headerlink" title="XU GUOJUN"></a>XU GUOJUN</h2><ul>
-<li>LIVING @BEIJING</li>
-<li>WORKING @IQIYI.COM</li>
+        <p>今天配置一个数据库链接地址时，报URL地址有问题，但在sublime Text里明明是正常的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://shgq.1.abc:1234/pools;http://shgq.2.abc:1234/pools#xxf</span><br></pre></td></tr></table></figure>
+<p>打开debug日志发现是地址解析错误，无法识别<code>&lt;200b&gt;</code>，但字符串中没有这个<code>&lt;200b&gt;</code>，是哪里冒出来的呢？</p>
+<p>于是，我重新把配置贴到用vim打开的文本中，才发现了隐藏字符。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://shgq.1.abc:1234/pools;http://shgq.2.abc:1234&lt;200b&gt;/pools#xxf</span><br></pre></td></tr></table></figure></p>
+<p>搜了一把这个<code>&lt;200&gt;</code>，学名zero-width space(ZWSP)，是一种不可见的打印字符。</p>
+<p>wikipedia给出一种实际的例子，可以很明显地看出区别，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Lorem​Ipsum​Dolor​Sit​Amet​Consectetur​Adipiscing​Elit​Sed​Do​Eiusmod​Tempor​Incididunt​Ut​Labore​Et​Dolore​Magna​Aliqua​Ut​Enim​Ad​Minim​Veniam​Quis​Nostrud​Exercitation​Ullamco​Laboris​Nisi​Ut​Aliquip​Ex​Ea​Commodo​Consequat​Duis​Aute​Irure​Dolor​In​Reprehenderit​In​Voluptate​Velit​Esse​Cillum​Dolore​Eu​Fugiat​Nulla​Pariatur​Excepteur​Sint​Occaecat​Cupidatat​Non​Proident​Sunt​In​Culpa​Qui​Officia​Deserunt​Mollit​Anim​Id​Est​Laborum</span><br></pre></td></tr></table></figure>
+<p>通过vim编辑时变成如下文本，中间多了很多<code>&lt;200b&gt;</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Lorem&lt;200b&gt;Ipsum&lt;200b&gt;Dolor&lt;200b&gt;Sit&lt;200b&gt;Amet&lt;200b&gt;Consectetur&lt;200b&gt;Adipiscing&lt;200b&gt;Elit&lt;2b&gt;Sed&lt;200b&gt;Do&lt;200b&gt;Eiusmod&lt;200b&gt;Tempor&lt;200b&gt;Incididunt&lt;200b&gt;Ut&lt;200b&gt;Labore&lt;200b&gt;Et&lt;200b&gt;Dole&lt;200b&gt;Magna&lt;200b&gt;Aliqua&lt;200b&gt;Ut&lt;200b&gt;Enim&lt;200b&gt;Ad&lt;200b&gt;Minim&lt;200b&gt;Veniam&lt;200b&gt;Quis&lt;200b&gt;Norud&lt;200b&gt;Exercitation&lt;200b&gt;Ullamco&lt;200b&gt;Laboris&lt;200b&gt;Nisi&lt;200b&gt;Ut&lt;200b&gt;Aliquip&lt;200b&gt;Ex&lt;200ba&lt;200b&gt;Commodo&lt;200b&gt;Consequat&lt;200b&gt;Duis&lt;200b&gt;Aute&lt;200b&gt;Irure&lt;200b&gt;Dolor&lt;200b&gt;In&lt;200b&gt;Reprehderit&lt;200b&gt;In&lt;200b&gt;Voluptate&lt;200b&gt;Velit&lt;200b&gt;Esse&lt;200b&gt;Cillum&lt;200b&gt;Dolore&lt;200b&gt;Eu&lt;200b&gt;Fugi&lt;200b&gt;Nulla&lt;200b&gt;Pariatur&lt;200b&gt;Excepteur&lt;200b&gt;Sint&lt;200b&gt;Occaecat&lt;200b&gt;Cupidatat&lt;200b&gt;Non&lt;20&gt;Proident&lt;200b&gt;Sunt&lt;200b&gt;In&lt;200b&gt;Culpa&lt;200b&gt;Qui&lt;200b&gt;Officia&lt;200b&gt;Deserunt&lt;200b&gt;Mollit&lt;200bnim&lt;200b&gt;Id&lt;200b&gt;Est&lt;200b&gt;Laborum</span><br></pre></td></tr></table></figure></p>
+<p>嗯，以后粘贴复制文本时需要多留一个心眼了。</p>
+<p>参考:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/Zero-width_space" target="_blank" rel="noopener">Zero-width space</a></li>
 </ul>
 
       
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/about/index.html" data-id="cjh0fm6gm0015be4gdctndh3k" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjh0fm6g1000ibe4g78s3ts2q" class="article-share-link">Share</a>
       
       
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unicode/">Unicode</a></li></ul>
+
     </footer>
   </div>
 
@@ -132,6 +144,16 @@
 
   
     
+<nav id="article-nav">
+  
+  
+    <a href="/2018/05/08/nginx-resolver-vaild-and-timeout/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">nginx resolver数据缓存及解析超时时间参数</div>
+    </a>
+  
+</nav>
+
   
 </article>
 
