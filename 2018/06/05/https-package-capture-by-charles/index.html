@@ -5,15 +5,20 @@
   
 
   
-  <title>Tag: Lua | QINGUAN</title>
+  <title>使用charles抓取iOS数据包 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="QINGUAN">
-<meta property="og:url" content="http://qinguan.github.io/tags/Lua/index.html">
+  <meta name="description" content="由于分析竞手的项目涉及到iOS端的请求抓包，翻阅并验证了一下，以下是整理的大致抓包流程。 工具软件: charles 3.11.5版本  安装mac端证书 Help-&amp;gt;SSL Proxy-&amp;gt;Install Charles Root Certificate.   开启代理设置 Proxy-&amp;gt;Proxy Setting…-&amp;gt;Proxies  HTTP Proxy 可以默认一个端">
+<meta name="keywords" content="Charles">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用charles抓取iOS数据包">
+<meta property="og:url" content="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/index.html">
 <meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="由于分析竞手的项目涉及到iOS端的请求抓包，翻阅并验证了一下，以下是整理的大致抓包流程。 工具软件: charles 3.11.5版本  安装mac端证书 Help-&amp;gt;SSL Proxy-&amp;gt;Install Charles Root Certificate.   开启代理设置 Proxy-&amp;gt;Proxy Setting…-&amp;gt;Proxies  HTTP Proxy 可以默认一个端">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-06-05T13:16:27.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QINGUAN">
+<meta name="twitter:title" content="使用charles抓取iOS数据包">
+<meta name="twitter:description" content="由于分析竞手的项目涉及到iOS端的请求抓包，翻阅并验证了一下，以下是整理的大致抓包流程。 工具软件: charles 3.11.5版本  安装mac端证书 Help-&amp;gt;SSL Proxy-&amp;gt;Install Charles Root Certificate.   开启代理设置 Proxy-&amp;gt;Proxy Setting…-&amp;gt;Proxies  HTTP Proxy 可以默认一个端">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -62,58 +67,108 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2018/04/14/lua-pcall-and-xpcall/" class="archive-article-date">
-  <time datetime="2018-04-14T06:51:40.000Z" itemprop="datePublished">4月 14</time>
+        <section id="main"><article id="post-https-package-capture-by-charles" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/05/https-package-capture-by-charles/" class="article-date">
+  <time datetime="2018-06-05T12:58:59.000Z" itemprop="datePublished">2018-06-05</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
+    <h1 class="article-title" itemprop="name">
+      使用charles抓取iOS数据包
     </h1>
   
 
-    </header>
-  </div>
-</article>
-  
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
     
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2018/04/12/some-tips-about-openresty-lua/" class="archive-article-date">
-  <time datetime="2018-04-12T03:34:24.000Z" itemprop="datePublished">4月 12</time>
-</a>
+    <div class="article-entry" itemprop="articleBody">
       
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/04/12/some-tips-about-openresty-lua/">关于openresty lua使用的一些tips</a>
-    </h1>
-  
+        <p>由于分析竞手的项目涉及到iOS端的请求抓包，翻阅并验证了一下，以下是整理的大致抓包流程。</p>
+<p>工具软件: charles 3.11.5版本</p>
+<ol>
+<li>安装mac端证书<ul>
+<li>Help-&gt;SSL Proxy-&gt;Install Charles Root Certificate.</li>
+</ul>
+</li>
+<li>开启代理设置<ul>
+<li>Proxy-&gt;Proxy Setting…-&gt;Proxies </li>
+<li>HTTP Proxy 可以默认一个端口如8888，并勾选Enable transparent HTTP proxying</li>
+<li>Socks Proxy可以Enable，并且Enable HTTP proxying over SOCKS，设置端口如80，443等</li>
+</ul>
+</li>
+<li>开启SSL代理(支持HTTPS抓包)<ul>
+<li>Proxy-&gt;SSL Proxying Setting，选中Enable SSL Proxying</li>
+<li>在Locations里面添加*:443，表示匹配所有的HTTPS网站</li>
+</ul>
+</li>
+<li>给iPhone安装证书<ul>
+<li>Help-&gt;SSL Proxy-&gt;Install Charles Root Certificate On a Mobile Device or remote Browers…</li>
+<li>根据弹出的提示框进行操作，也就是用iPhone的Safari打开地址<a href="http://charlesproxy.com/getssl" target="_blank" rel="noopener">http://charlesproxy.com/getssl</a> 下载安装。</li>
+<li>iOS11以上系统需要在设置 &gt; 关于本机 &gt; 证书信任设置，信任该证书。</li>
+</ul>
+</li>
+<li>手机连接wifi(同电脑一个局域网或者直接连电脑的热点)，配置HTTP代理，选择’手动’，输入电脑的ip地址和端口号(默认8888)</li>
+</ol>
 
-    </header>
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cji1piyro00001z4gbd614yl4" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Charles/">Charles</a></li></ul>
+
+    </footer>
   </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/06/05/java-unused-import-statment/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Java import 失效</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>
