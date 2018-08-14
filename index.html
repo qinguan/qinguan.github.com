@@ -64,6 +64,83 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-rmi-deserialization-vulnerability" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/13/rmi-deserialization-vulnerability/" class="article-date">
+  <time datetime="2018-08-13T08:04:23.000Z" itemprop="datePublished">2018-08-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/13/rmi-deserialization-vulnerability/">RMI反序列化漏洞</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>接到公司安全组提的漏洞单，说部分Java机器开了jmxremote端口，存在安全隐患。</p>
+<p>查了下原来有不少Java服务默认开启了非安全模式的jmxremote端口。</p>
+<p>修复(降低风险)方案有如下几种方式：</p>
+<ol>
+<li>使用<a href="https://github.com/ikkisoft/SerialKiller" target="_blank" rel="noopener">SerialKiller</a>,详细的在RMI反序列化漏洞文章中有介绍，略复杂</li>
+<li>对于jmxremote没有强依赖的服务，可以直接禁用jmxremote端口，删除相关配置项</li>
+<li>授权访问：配置认证密码或者ssl，或者配置ip白名单 -Dcom.sun.management.jmxremote.host=serverXXX</li>
+</ol>
+<p>关于RMI反序列化漏洞的介绍:<br><a href="http://blog.nsfocus.net/java-deserialization-vulnerability-overlooked-mass-destruction/" target="_blank" rel="noopener">http://blog.nsfocus.net/java-deserialization-vulnerability-overlooked-mass-destruction/</a><br>关于JMX配置的一些介绍:<br><a href="https://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html</a><br><a href="https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/guides/management/agent.html</a></p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/08/13/rmi-deserialization-vulnerability/" data-id="cjks02ch30005w94gaj38k4mc" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Serialization/">Serialization</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-https-package-capture-by-charles" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/06/05/https-package-capture-by-charles/" class="article-date">
@@ -123,7 +200,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cji1piyro00001z4gbd614yl4" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cjks02ch00003w94gxamb8yf7" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Charles/">Charles</a></li></ul>
@@ -193,7 +270,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cji1piyrz00051z4ghx0actco" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cjks02ch20004w94gico9kwva" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
@@ -273,7 +350,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cji1piysf000m1z4gmctqx8qr" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjks02chk000pw94gblqcezph" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unicode/">Unicode</a></li></ul>
@@ -351,7 +428,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cji1piys300091z4ghlppficj" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjks02ch9000cw94gxs0p0pbq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NGINX/">NGINX</a></li></ul>
@@ -512,7 +589,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cji1piys5000b1z4g10j5vbl1" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjks02chb000fw94g9vsjuahz" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SLF4J/">SLF4J</a></li></ul>
@@ -586,7 +663,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cji1piysc000i1z4gn6z44rff" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjks02chi000lw94g7jvkfdju" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
@@ -663,7 +740,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cji1piys000061z4guqtvj5id" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjks02ch60008w94gztc53ogi" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li></ul>
@@ -772,7 +849,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cji1piysa000g1z4g70igsu9c" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjks02che000hw94gy7qs3696" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
@@ -850,80 +927,10 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cji1piyrv00021z4gujdppg0c" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjks02cgv0001w94g9oamylad" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
-
-    </footer>
-  </div>
-
-<div id="disqus_thread"></div>
-<script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-  
-</article>
-
-
-
-  
-    <article id="post-tools-for-build-a-website" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/07/tools-for-build-a-website/" class="article-date">
-  <time datetime="2018-04-07T14:09:57.000Z" itemprop="datePublished">2018-04-07</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/07/tools-for-build-a-website/">个人站点工具集锦</a>
-    </h1>
-  
-
-	<br/>
-        <div>
-	<span id="busuanzi_container_page_pv" style='display:none'>
-	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
-	</span>
-	</div>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="评论"><a href="#评论" class="headerlink" title="评论"></a>评论</h2><p>评论可以使用<a href="https://disqus.com/" target="_blank" rel="noopener">disqus</a>，登录注册后使用<code>Universal Code install instructions</code>。</p>
-<h2 id="统计"><a href="#统计" class="headerlink" title="统计"></a>统计</h2><p>站点阅读数、文章阅读数、站点UV等，可以使用<a href="http://ibruce.info/2015/04/04/busuanzi/" target="_blank" rel="noopener">不蒜子</a>。</p>
-
-      
-    </div>
-
-    <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cji1piysd000k1z4gno4nwzko" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/">other</a></li></ul>
 
     </footer>
   </div>
@@ -973,7 +980,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Charles/">Charles</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NGINX/">NGINX</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unicode/">Unicode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Charles/">Charles</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NGINX/">NGINX</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serialization/">Serialization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unicode/">Unicode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
     </div>
   </div>
 
@@ -983,7 +990,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
@@ -992,7 +999,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li></ul>
     </div>
   </div>
 
@@ -1003,6 +1010,10 @@
     <h3 class="widget-title">最新文章</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2018/08/13/rmi-deserialization-vulnerability/">RMI反序列化漏洞</a>
+          </li>
         
           <li>
             <a href="/2018/06/05/https-package-capture-by-charles/">使用charles抓取iOS数据包</a>
@@ -1018,10 +1029,6 @@
         
           <li>
             <a href="/2018/05/08/nginx-resolver-vaild-and-timeout/">nginx resolver数据缓存及解析超时时间参数</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/04/slf4j-stackoverflowerror/">SLF4J及日志栈溢出问题</a>
           </li>
         
       </ul>
