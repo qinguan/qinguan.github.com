@@ -5,15 +5,20 @@
   
 
   
-  <title>Tag: SLF4J | QINGUAN</title>
+  <title>Netty版本冲突引起Cassandra访问异常 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="QINGUAN">
-<meta property="og:url" content="http://qinguan.github.io/tags/SLF4J/index.html">
+  <meta name="description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
+<meta name="keywords" content="Java,Netty">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Netty版本冲突引起Cassandra访问异常">
+<meta property="og:url" content="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/index.html">
 <meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-14T16:08:29.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QINGUAN">
+<meta name="twitter:title" content="Netty版本冲突引起Cassandra访问异常">
+<meta name="twitter:description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -62,39 +67,84 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2018/05/04/slf4j-stackoverflowerror/" class="archive-article-date">
-  <time datetime="2018-05-04T06:47:34.000Z" itemprop="datePublished">5月 4</time>
+        <section id="main"><article id="post-netty-version-conflicting-exception" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/15/netty-version-conflicting-exception/" class="article-date">
+  <time datetime="2018-08-14T16:02:02.000Z" itemprop="datePublished">2018-08-15</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2018/05/04/slf4j-stackoverflowerror/">SLF4J及日志栈溢出问题</a>
+    <h1 class="article-title" itemprop="name">
+      Netty版本冲突引起Cassandra访问异常
     </h1>
   
 
-    </header>
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">java.lang.AbstractMethodError: </span><br><span class="line">io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/</span><br><span class="line">    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/util/concurrent/EventExecutor</span><br></pre></td></tr></table></figure></p>
+<p>排查了一圈，最终发现是Netty引起的。<br>Java RPC服务依赖的是Netty3.X版本，Cassandra驱动测试包依赖的是Netty4.X版本，将Netty版本调整成一致解决。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjktweozb0005j94go1usjd6c" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Netty/">Netty</a></li></ul>
+
+    </footer>
   </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2018/08/13/rmi-deserialization-vulnerability/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">RMI反序列化漏洞</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>
