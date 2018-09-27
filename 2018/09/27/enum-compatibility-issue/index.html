@@ -5,20 +5,20 @@
   
 
   
-  <title>个人站点工具集锦 | QINGUAN</title>
+  <title>Thrift枚举对象兼容性问题 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="评论评论可以使用disqus，登录注册后使用Universal Code install instructions。 统计站点阅读数、文章阅读数、站点UV等，可以使用不蒜子。">
-<meta name="keywords" content="other">
+  <meta name="description" content="最近在一个基于Thrift框架的RPC服务中碰到一个枚举值的兼容性问题。简单描述如下:有一个位置定义，起初只有两个枚举值，LEFT和RIGHT。然后发布schema定义版本1.0，客户端服务引用version = 1.0。12345// commom.thriftenum Position &amp;#123;    LEFT      =0,    RIGHT     =1,&amp;#125; 经过一段时间，">
+<meta name="keywords" content="Java,RPC">
 <meta property="og:type" content="article">
-<meta property="og:title" content="个人站点工具集锦">
-<meta property="og:url" content="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/index.html">
+<meta property="og:title" content="Thrift枚举对象兼容性问题">
+<meta property="og:url" content="http://qinguan.github.io/2018/09/27/enum-compatibility-issue/index.html">
 <meta property="og:site_name" content="QINGUAN">
-<meta property="og:description" content="评论评论可以使用disqus，登录注册后使用Universal Code install instructions。 统计站点阅读数、文章阅读数、站点UV等，可以使用不蒜子。">
+<meta property="og:description" content="最近在一个基于Thrift框架的RPC服务中碰到一个枚举值的兼容性问题。简单描述如下:有一个位置定义，起初只有两个枚举值，LEFT和RIGHT。然后发布schema定义版本1.0，客户端服务引用version = 1.0。12345// commom.thriftenum Position &amp;#123;    LEFT      =0,    RIGHT     =1,&amp;#125; 经过一段时间，">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-26T11:59:37.000Z">
+<meta property="og:updated_time" content="2018-09-27T15:13:31.801Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="个人站点工具集锦">
-<meta name="twitter:description" content="评论评论可以使用disqus，登录注册后使用Universal Code install instructions。 统计站点阅读数、文章阅读数、站点UV等，可以使用不蒜子。">
+<meta name="twitter:title" content="Thrift枚举对象兼容性问题">
+<meta name="twitter:description" content="最近在一个基于Thrift框架的RPC服务中碰到一个枚举值的兼容性问题。简单描述如下:有一个位置定义，起初只有两个枚举值，LEFT和RIGHT。然后发布schema定义版本1.0，客户端服务引用version = 1.0。12345// commom.thriftenum Position &amp;#123;    LEFT      =0,    RIGHT     =1,&amp;#125; 经过一段时间，">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -67,10 +67,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-tools-for-build-a-website" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-enum-compatibility-issue" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/04/07/tools-for-build-a-website/" class="article-date">
-  <time datetime="2018-04-07T14:09:57.000Z" itemprop="datePublished">2018-04-07</time>
+    <a href="/2018/09/27/enum-compatibility-issue/" class="article-date">
+  <time datetime="2018-09-27T14:37:29.000Z" itemprop="datePublished">2018-09-27</time>
 </a>
     
   </div>
@@ -81,7 +81,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      个人站点工具集锦
+      Thrift枚举对象兼容性问题
     </h1>
   
 
@@ -95,17 +95,34 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="评论"><a href="#评论" class="headerlink" title="评论"></a>评论</h2><p>评论可以使用<a href="https://disqus.com/" target="_blank" rel="noopener">disqus</a>，登录注册后使用<code>Universal Code install instructions</code>。</p>
-<h2 id="统计"><a href="#统计" class="headerlink" title="统计"></a>统计</h2><p>站点阅读数、文章阅读数、站点UV等，可以使用<a href="http://ibruce.info/2015/04/04/busuanzi/" target="_blank" rel="noopener">不蒜子</a>。</p>
+        <p>最近在一个基于Thrift框架的RPC服务中碰到一个枚举值的兼容性问题。<br>简单描述如下:<br>有一个位置定义，起初只有两个枚举值，LEFT和RIGHT。然后发布schema定义版本1.0，客户端服务引用version = 1.0。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commom.thrift</span></span><br><span class="line"><span class="keyword">enum</span> Position &#123;</span><br><span class="line">    LEFT      =<span class="number">0</span>,</span><br><span class="line">    RIGHT     =<span class="number">1</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>经过一段时间，Position需要扩展，增加UP和DOWN，发布schema定义版本2.0。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commom.thrift</span></span><br><span class="line"><span class="keyword">enum</span> Position &#123;</span><br><span class="line">    LEFT      =<span class="number">0</span>,</span><br><span class="line">    RIGHT     =<span class="number">1</span>,</span><br><span class="line">    UP        =<span class="number">2</span>,</span><br><span class="line">    DOWN      =<span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时，客户端还在使用schema=1.0版本。若服务端返回了Position.UP或者Position.DOWN数据到客户端，客户端是不识别这两个枚举值的。问题就这样产生了，客户端有可能因为没有对未知数据进行兼容处理而直接报错异常了。</p>
+<p>实际上，有几种设计是违反<strong>向后兼容</strong>原则的，上述情况就是典型的一种，即<strong>向枚举类型中新增枚举值</strong>。这种场景下，原则上要求所有客户端均先于服务端进行升级到最新版本。鉴于分布式服务应用场景，要求所有客户端都统一升级，是几乎不可能实现的。</p>
+<p>针对<strong>向已有枚举类型中新增枚举值</strong>的情况，Thrift和Protobuf各有一些处理:</p>
+<ol>
+<li>Thrift：针对不认识的枚举值，默认返回null(通过findByValue实现)</li>
+<li>Protobuf：针对不认识的枚举值，默认返回枚举类型的第一个值(或者返回default value，如有)<ul>
+<li>注: 所以Protobuf定义的schema enum一般都会设第一个值为UNKNOWN以兼容低版本客户端</li>
+</ul>
+</li>
+</ol>
+<p>在阿里巴巴的Java编码规范中也有相关规则：<strong>强制“接口返回值不允许使用枚举类型或者包含枚举类型的POJO对象”</strong>。</p>
+<p>Thrift/Protobuf协议本身对新增枚举值的处理没有问题(至少在反序列化方法中没有简单粗暴地直接抛出异常)，但对业务层的处理及使用提出了一定的要求，即业务层有可能读到null(Thrift)或者UNKONWN类型枚举(Protobuf)，需要做一定的防御性判断。</p>
+<p>进一步阅读资料:</p>
+<ol>
+<li><a href="https://github.com/bkayser/thrift-versioning-doc" target="_blank" rel="noopener">thrift-versioning-doc</a></li>
+<li><a href="https://developers.google.com/protocol-buffers/docs/proto#updating" target="_blank" rel="noopener">Updating A Message Type</a></li>
+</ol>
 
       
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjmkpl7ei000ut54ga890yf9d" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/09/27/enum-compatibility-issue/" data-id="cjmkpl7dv0001t54g0y3heyxe" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/">other</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RPC/">RPC</a></li></ul>
 
     </footer>
   </div>
@@ -135,19 +152,10 @@
     
 <nav id="article-nav">
   
-    <a href="/2018/04/08/git-merge-commits-into-one/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          Git 合并分支多个commits
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/03/20/couchbase-client-2x-compress/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/08/22/a-high-coupling-case/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">Couchbase client 2.x 自定义压缩支持</div>
+      <div class="article-nav-title">一个内部API高度耦合的Java实现案例</div>
     </a>
   
 </nav>

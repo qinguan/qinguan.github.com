@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>一个内部API高度耦合的Java实现案例 | QINGUAN</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="某项目使用了“一套API，多种底层存储”的设计方式，可以灵活切换多种数据源，但同时能够保持暴露的API接口定义一致。这种设计方式，优点是显而易见的。 随着业务的增长，数据量越来越大。单种类存储已经捉襟见肘，需要依赖多种存储共同保障服务的状况下，早期高度耦合的内部API实现使得存储的改造工作量增大了不少。 以某项目为例，原本业务数据量没那么大，选择了Redis作为线上业务的主要存储，以Couchba">
+<meta name="keywords" content="Java,Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个内部API高度耦合的Java实现案例">
+<meta property="og:url" content="http://qinguan.github.io/2018/08/22/a-high-coupling-case/index.html">
+<meta property="og:site_name" content="QINGUAN">
+<meta property="og:description" content="某项目使用了“一套API，多种底层存储”的设计方式，可以灵活切换多种数据源，但同时能够保持暴露的API接口定义一致。这种设计方式，优点是显而易见的。 随着业务的增长，数据量越来越大。单种类存储已经捉襟见肘，需要依赖多种存储共同保障服务的状况下，早期高度耦合的内部API实现使得存储的改造工作量增大了不少。 以某项目为例，原本业务数据量没那么大，选择了Redis作为线上业务的主要存储，以Couchba">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-08-22T12:51:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一个内部API高度耦合的Java实现案例">
+<meta name="twitter:description" content="某项目使用了“一套API，多种底层存储”的设计方式，可以灵活切换多种数据源，但同时能够保持暴露的API接口定义一致。这种设计方式，优点是显而易见的。 随着业务的增长，数据量越来越大。单种类存储已经捉襟见肘，需要依赖多种存储共同保障服务的状况下，早期高度耦合的内部API实现使得存储的改造工作量增大了不少。 以某项目为例，原本业务数据量没那么大，选择了Redis作为线上业务的主要存储，以Couchba">
+  
+    <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">QINGUAN</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+          <a class="main-nav-link" href="/about">About</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://qinguan.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-a-high-coupling-case" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/22/a-high-coupling-case/" class="article-date">
+  <time datetime="2018-08-22T05:49:03.000Z" itemprop="datePublished">2018-08-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      一个内部API高度耦合的Java实现案例
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>某项目使用了“一套API，多种底层存储”的设计方式，可以灵活切换多种数据源，但同时能够保持暴露的API接口定义一致。这种设计方式，优点是显而易见的。</p>
+<p>随着业务的增长，数据量越来越大。单种类存储已经捉襟见肘，需要依赖多种存储共同保障服务的状况下，早期高度耦合的内部API实现使得存储的改造工作量增大了不少。</p>
+<p>以某项目为例，原本业务数据量没那么大，选择了Redis作为线上业务的主要存储，以Couchbase为辅，同时利用HBase实现了一套在线冷备服务，其中RedisAPI和HBaseAPI互斥。但随着数据量的突飞猛进，Redis的容量已不堪重负，计划全部迁移到容量更大的分布性缓存Couchbase。同时，在Couchbase存储未命中时，回源到HBase服务进行兜底读取。</p>
+<p>由于上层业务逻辑基于同一套存储API实现的，为同时使用多种存储，要求对这套存储API进行改造。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//common jar</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">get</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NotImplementedException(<span class="string">"not implement!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(String key, <span class="keyword">byte</span>[] value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//couchbase.repo jar</span></span><br><span class="line"><span class="meta">@Repository</span>(<span class="string">"cbDataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CocuhbaseRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//hbase.repo jar</span></span><br><span class="line"><span class="meta">@Repository</span>(<span class="string">"dataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HBaseRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//redis.repo jar</span></span><br><span class="line"><span class="meta">@Component</span>(<span class="string">"dataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//serviceA</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo dataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo cbDataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getEntity</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NotImplementedException(<span class="string">"not implement!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEntity</span><span class="params">(String key, Object value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//serviceB</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo dataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo cbDataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通用API</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getEntity</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> dataRepo.get(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通用API</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEntity</span><span class="params">(String key, Object value)</span> </span>&#123;</span><br><span class="line">        dataRepo.set(key, toByte(value))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">上层业务模块A需要依赖redis的高效部署业务，则可以引入service.jar、redis.repo jar、common.jar、couchbase.repo jar来实现；</span><br><span class="line">上层业务模块B需要依赖hbase来实现离线任务，则可引入service.jar、hbase.repo jar、common.jar、couchbase.repo jar来实现。</span><br></pre></td></tr></table></figure>
+<p>如上所示，上层业务模块只需要按需导入hbase.repo jar或者redis.repo jar，然后利用Spring自动注入机制，获取dataRepo实例，基于同一套get/set API进行存储的读写操作。对上层业务而言，它是无需感知底层业务代码使用了哪一套存储。</p>
+<p>此时，若将RedisRepo全部迁移到CouchbaseRepo，则会涉及到dataRepoAPI的使用变更，redis部分变化，但必须保持HBase不变。</p>
+<p>解决方案:<br>1、新增Proxy，将底层RepoAPI再加一层代理，按需路由到不同的repo实现。<br>2、基于Spring Condition条件化构建Repo Bean。</p>
+<p>话说回来，这类还是场景考虑不全，实现的不够理想。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/08/22/a-high-coupling-case/" data-id="cjmkpl7dr0000t54gy809sz5r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/09/27/enum-compatibility-issue/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Thrift枚举对象兼容性问题
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/08/15/netty-version-conflicting-exception/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Netty版本冲突引起Cassandra访问异常</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Charles/">Charles</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NGINX/">NGINX</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Netty/">Netty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serialization/">Serialization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unicode/">Unicode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/27/enum-compatibility-issue/">Thrift枚举对象兼容性问题</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/22/a-high-coupling-case/">一个内部API高度耦合的Java实现案例</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/15/netty-version-conflicting-exception/">Netty版本冲突引起Cassandra访问异常</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/13/rmi-deserialization-vulnerability/">RMI反序列化漏洞</a>
+          </li>
+        
+          <li>
+            <a href="/2018/06/05/https-package-capture-by-charles/">使用charles抓取iOS数据包</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+  </script>
+
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <span id="busuanzi_container_site_pv">
+	<i class="fa fa-eye"></i>
+        <!-- 本站总访问量<span id="busuanzi_value_site_pv"></span>次 -->
+      </span>
+      </br>
+      &copy; 2018 Xu Guojun<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

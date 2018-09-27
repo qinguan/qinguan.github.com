@@ -64,6 +64,170 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-enum-compatibility-issue" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/27/enum-compatibility-issue/" class="article-date">
+  <time datetime="2018-09-27T14:37:29.000Z" itemprop="datePublished">2018-09-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/27/enum-compatibility-issue/">Thrift枚举对象兼容性问题</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近在一个基于Thrift框架的RPC服务中碰到一个枚举值的兼容性问题。<br>简单描述如下:<br>有一个位置定义，起初只有两个枚举值，LEFT和RIGHT。然后发布schema定义版本1.0，客户端服务引用version = 1.0。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commom.thrift</span></span><br><span class="line"><span class="keyword">enum</span> Position &#123;</span><br><span class="line">    LEFT      =<span class="number">0</span>,</span><br><span class="line">    RIGHT     =<span class="number">1</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>经过一段时间，Position需要扩展，增加UP和DOWN，发布schema定义版本2.0。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commom.thrift</span></span><br><span class="line"><span class="keyword">enum</span> Position &#123;</span><br><span class="line">    LEFT      =<span class="number">0</span>,</span><br><span class="line">    RIGHT     =<span class="number">1</span>,</span><br><span class="line">    UP        =<span class="number">2</span>,</span><br><span class="line">    DOWN      =<span class="number">3</span>,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时，客户端还在使用schema=1.0版本。若服务端返回了Position.UP或者Position.DOWN数据到客户端，客户端是不识别这两个枚举值的。问题就这样产生了，客户端有可能因为没有对未知数据进行兼容处理而直接报错异常了。</p>
+<p>实际上，有几种设计是违反<strong>向后兼容</strong>原则的，上述情况就是典型的一种，即<strong>向枚举类型中新增枚举值</strong>。这种场景下，原则上要求所有客户端均先于服务端进行升级到最新版本。鉴于分布式服务应用场景，要求所有客户端都统一升级，是几乎不可能实现的。</p>
+<p>针对<strong>向已有枚举类型中新增枚举值</strong>的情况，Thrift和Protobuf各有一些处理:</p>
+<ol>
+<li>Thrift：针对不认识的枚举值，默认返回null(通过findByValue实现)</li>
+<li>Protobuf：针对不认识的枚举值，默认返回枚举类型的第一个值(或者返回default value，如有)<ul>
+<li>注: 所以Protobuf定义的schema enum一般都会设第一个值为UNKNOWN以兼容低版本客户端</li>
+</ul>
+</li>
+</ol>
+<p>在阿里巴巴的Java编码规范中也有相关规则：<strong>强制“接口返回值不允许使用枚举类型或者包含枚举类型的POJO对象”</strong>。</p>
+<p>Thrift/Protobuf协议本身对新增枚举值的处理没有问题(至少在反序列化方法中没有简单粗暴地直接抛出异常)，但对业务层的处理及使用提出了一定的要求，即业务层有可能读到null(Thrift)或者UNKONWN类型枚举(Protobuf)，需要做一定的防御性判断。</p>
+<p>进一步阅读资料:</p>
+<ol>
+<li><a href="https://github.com/bkayser/thrift-versioning-doc" target="_blank" rel="noopener">thrift-versioning-doc</a></li>
+<li><a href="https://developers.google.com/protocol-buffers/docs/proto#updating" target="_blank" rel="noopener">Updating A Message Type</a></li>
+</ol>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/09/27/enum-compatibility-issue/" data-id="cjmkpl7dv0001t54g0y3heyxe" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RPC/">RPC</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
+    <article id="post-a-high-coupling-case" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/22/a-high-coupling-case/" class="article-date">
+  <time datetime="2018-08-22T05:49:03.000Z" itemprop="datePublished">2018-08-22</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/22/a-high-coupling-case/">一个内部API高度耦合的Java实现案例</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>某项目使用了“一套API，多种底层存储”的设计方式，可以灵活切换多种数据源，但同时能够保持暴露的API接口定义一致。这种设计方式，优点是显而易见的。</p>
+<p>随着业务的增长，数据量越来越大。单种类存储已经捉襟见肘，需要依赖多种存储共同保障服务的状况下，早期高度耦合的内部API实现使得存储的改造工作量增大了不少。</p>
+<p>以某项目为例，原本业务数据量没那么大，选择了Redis作为线上业务的主要存储，以Couchbase为辅，同时利用HBase实现了一套在线冷备服务，其中RedisAPI和HBaseAPI互斥。但随着数据量的突飞猛进，Redis的容量已不堪重负，计划全部迁移到容量更大的分布性缓存Couchbase。同时，在Couchbase存储未命中时，回源到HBase服务进行兜底读取。</p>
+<p>由于上层业务逻辑基于同一套存储API实现的，为同时使用多种存储，要求对这套存储API进行改造。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//common jar</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">default</span> <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">get</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NotImplementedException(<span class="string">"not implement!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">default</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(String key, <span class="keyword">byte</span>[] value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//couchbase.repo jar</span></span><br><span class="line"><span class="meta">@Repository</span>(<span class="string">"cbDataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CocuhbaseRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//hbase.repo jar</span></span><br><span class="line"><span class="meta">@Repository</span>(<span class="string">"dataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HBaseRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//redis.repo jar</span></span><br><span class="line"><span class="meta">@Component</span>(<span class="string">"dataRepo"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RedisRepo</span> <span class="keyword">implements</span> <span class="title">BaseTestRepo</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//serviceA</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestAService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo dataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo cbDataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getEntity</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NotImplementedException(<span class="string">"not implement!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEntity</span><span class="params">(String key, Object value)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//serviceB</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestBService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo dataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    BaseTestRepo cbDataRepo;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通用API</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getEntity</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> dataRepo.get(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通用API</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setEntity</span><span class="params">(String key, Object value)</span> </span>&#123;</span><br><span class="line">        dataRepo.set(key, toByte(value))</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//TODO</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">上层业务模块A需要依赖redis的高效部署业务，则可以引入service.jar、redis.repo jar、common.jar、couchbase.repo jar来实现；</span><br><span class="line">上层业务模块B需要依赖hbase来实现离线任务，则可引入service.jar、hbase.repo jar、common.jar、couchbase.repo jar来实现。</span><br></pre></td></tr></table></figure>
+<p>如上所示，上层业务模块只需要按需导入hbase.repo jar或者redis.repo jar，然后利用Spring自动注入机制，获取dataRepo实例，基于同一套get/set API进行存储的读写操作。对上层业务而言，它是无需感知底层业务代码使用了哪一套存储。</p>
+<p>此时，若将RedisRepo全部迁移到CouchbaseRepo，则会涉及到dataRepoAPI的使用变更，redis部分变化，但必须保持HBase不变。</p>
+<p>解决方案:<br>1、新增Proxy，将底层RepoAPI再加一层代理，按需路由到不同的repo实现。<br>2、基于Spring Condition条件化构建Repo Bean。</p>
+<p>话说回来，这类还是场景考虑不全，实现的不够理想。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/08/22/a-high-coupling-case/" data-id="cjmkpl7dr0000t54gy809sz5r" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-netty-version-conflicting-exception" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/08/15/netty-version-conflicting-exception/" class="article-date">
@@ -99,7 +263,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjktweozb0005j94go1usjd6c" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjmkpl7ea000ht54gh05guuzl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Netty/">Netty</a></li></ul>
@@ -176,7 +340,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/13/rmi-deserialization-vulnerability/" data-id="cjktweozk000fj94g60grppal" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/08/13/rmi-deserialization-vulnerability/" data-id="cjmkpl7e8000gt54g4pyaoicc" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Serialization/">Serialization</a></li></ul>
@@ -270,7 +434,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cjktweoza0004j94gbhblojt8" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cjmkpl7e00005t54gnngzg4aj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Charles/">Charles</a></li></ul>
@@ -340,7 +504,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cjktweoz50001j94gp8nyni3z" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cjmkpl7e20007t54grroytr73" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
@@ -420,7 +584,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjktweozv000rj94gf45nu06j" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjmkpl7ej000wt54g3qd535mn" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unicode/">Unicode</a></li></ul>
@@ -498,7 +662,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjktweozi000cj94ghcxzy7c6" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjmkpl7eb000jt54g3xec3c5o" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NGINX/">NGINX</a></li></ul>
@@ -659,7 +823,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjktweozo000hj94g8vlsc3eu" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjmkpl7ed000lt54ggnx358bq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SLF4J/">SLF4J</a></li></ul>
@@ -733,196 +897,10 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjktweozr000nj94gzh1cknxm" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjmkpl7eg000rt54gk0yo36uu" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
-
-    </footer>
-  </div>
-
-<div id="disqus_thread"></div>
-<script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-  
-</article>
-
-
-
-  
-    <article id="post-lua-pcall-and-xpcall" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/14/lua-pcall-and-xpcall/" class="article-date">
-  <time datetime="2018-04-14T06:51:40.000Z" itemprop="datePublished">2018-04-14</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/14/lua-pcall-and-xpcall/">Lua pcall及xpcall函数</a>
-    </h1>
-  
-
-	<br/>
-        <div>
-	<span id="busuanzi_container_page_pv" style='display:none'>
-	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
-	</span>
-	</div>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Lua应用在一般情况下很少使用到异常错误处理，但有时为了防止模块调用异常、函数调用异常、文件读写异常等一些非关键路径(有重试/容错手段)直接抛出异常，中断执行，会封装这些函数的调用，进行异常捕获。</p>
-<p>Lua的异常捕获主要基于<a href="https://www.lua.org/pil/8.4.html" target="_blank" rel="noopener">pcall</a>及<a href="https://www.lua.org/pil/8.5.html" target="_blank" rel="noopener">xpcall函数</a>。</p>
-<h2 id="pcall函数"><a href="#pcall函数" class="headerlink" title="pcall函数"></a><a href="https://www.gammon.com.au/scripts/doc.php?lua=pcall" target="_blank" rel="noopener">pcall函数</a></h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Summary</span><br><span class="line">Calls a <span class="function"><span class="keyword">function</span> <span class="title">in</span> <span class="title">protected</span> <span class="title">mode</span></span></span><br><span class="line"><span class="function"><span class="title">Prototype</span></span></span><br><span class="line"><span class="function"><span class="title">ok</span>, <span class="title">result</span> [ , <span class="title">result2</span> ...] = <span class="title">pcall</span> <span class="params">(f, arg1, arg2, ...)</span></span></span><br><span class="line"></span><br><span class="line">Description</span><br><span class="line">Calls <span class="function"><span class="keyword">function</span> <span class="title">f</span> <span class="title">with</span> <span class="title">the</span> <span class="title">supplied</span> <span class="title">arguments</span> <span class="title">in</span> <span class="title">protected</span> <span class="title">mode</span>. <span class="title">Catches</span> <span class="title">errors</span> <span class="title">and</span> <span class="title">returns</span>:</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">On</span> <span class="title">success</span>:</span></span><br><span class="line"><span class="function"><span class="title">true</span></span></span><br><span class="line"><span class="function"><span class="title">function</span> <span class="title">result</span><span class="params">(s)</span></span> - may be more than one</span><br><span class="line"></span><br><span class="line">On failure:</span><br><span class="line"><span class="literal">false</span></span><br><span class="line"><span class="built_in">error</span> message</span><br></pre></td></tr></table></figure>
-<p>举个简单的例子:<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--- 求和</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sum</span><span class="params">(a,b,c)</span></span></span><br><span class="line">    d = a + b + c</span><br><span class="line">    <span class="keyword">return</span> d</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> e = sum(<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">"e:"</span>, e)</span><br><span class="line"><span class="keyword">local</span> h = sum(<span class="string">"ten"</span>, <span class="string">"forty"</span>, <span class="string">"nine"</span>)</span><br><span class="line"><span class="built_in">print</span> (<span class="string">"h:"</span>, h)</span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">e:      <span class="number">60</span></span><br><span class="line">lua: src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'a'</span> (a <span class="built_in">string</span> value)</span><br><span class="line">stack <span class="built_in">traceback</span>:</span><br><span class="line">        src/pcall_test.lua:<span class="number">12</span>: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> '<span class="title">sum</span>'</span></span><br><span class="line"><span class="function">        <span class="title">src</span>/<span class="title">pcall_test.lua</span>:26: <span class="title">in</span> <span class="title">main</span> <span class="title">chunk</span></span></span><br><span class="line"><span class="function">        [<span class="title">C</span>]: <span class="title">in</span> ?</span></span><br></pre></td></tr></table></figure></p>
-<p>如上述代码所示，当sum函数碰到无法处理的字符串输出时，抛出了一个异常，中止了程序运行。</p>
-<p>如果我们期望捕获这种异常，做处理，并继续运行程序，可以如下这样调用：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> f, vrf = <span class="built_in">pcall</span>(sum, <span class="string">"ten"</span>, <span class="string">"twenty"</span>, <span class="string">"thirty"</span>)</span><br><span class="line"><span class="keyword">if</span> f <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">print</span>(vrf)</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"failed to call sum function:"</span> .. vrf)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">failed to call sum <span class="function"><span class="keyword">function</span>:<span class="title">src</span>/<span class="title">pcall_test.lua</span>:12: <span class="title">attempt</span> <span class="title">to</span> <span class="title">perform</span> <span class="title">arithmetic</span> <span class="title">on</span> <span class="title">local</span> '<span class="title">a</span>' <span class="params">(a string value)</span></span></span><br></pre></td></tr></table></figure></p>
-<h2 id="xpcall函数"><a href="#xpcall函数" class="headerlink" title="xpcall函数"></a><a href="https://www.gammon.com.au/scripts/doc.php?lua=xpcall" target="_blank" rel="noopener">xpcall函数</a></h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Summary</span><br><span class="line">Calls a <span class="function"><span class="keyword">function</span> <span class="title">with</span> <span class="title">a</span> <span class="title">custom</span> <span class="title">error</span> <span class="title">handler</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="title">Prototype</span></span></span><br><span class="line"><span class="function"><span class="title">ok</span>, <span class="title">result</span> = <span class="title">xpcall</span> <span class="params">(f, err)</span></span></span><br><span class="line"></span><br><span class="line">If an <span class="built_in">error</span> occurs <span class="keyword">in</span> f it is caught <span class="keyword">and</span> the <span class="built_in">error</span>-handler <span class="string">'err'</span> is called. Then <span class="built_in">xpcall</span> returns <span class="literal">false</span>, <span class="keyword">and</span> whatever the <span class="built_in">error</span> handler returned.</span><br><span class="line"></span><br><span class="line">If there is no <span class="built_in">error</span> <span class="keyword">in</span> f, <span class="keyword">then</span> <span class="built_in">xpcall</span> returns <span class="literal">true</span>, followed by the <span class="function"><span class="keyword">function</span> <span class="title">results</span> <span class="title">from</span> <span class="title">f</span>.</span></span><br></pre></td></tr></table></figure>
-<p>举个简单的例子:<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> <span class="function"><span class="keyword">function</span> <span class="title">err_handle</span><span class="params">(x)</span></span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"err_handle info:"</span> .. x)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">local</span> f, res = <span class="built_in">xpcall</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span></span></span><br><span class="line">    <span class="keyword">return</span> sum(<span class="number">10</span>, <span class="number">20</span>, <span class="string">"a"</span>)</span><br><span class="line"><span class="keyword">end</span> , err_handle)</span><br><span class="line"><span class="built_in">print</span>(f, res)</span><br><span class="line"></span><br><span class="line"><span class="comment">--output:</span></span><br><span class="line">err_handle info:src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'c'</span> (a <span class="built_in">string</span> value)</span><br><span class="line"><span class="literal">false</span>   <span class="literal">nil</span></span><br></pre></td></tr></table></figure></p>
-<p>上面的err_handle就是定义的一个错误处理函数，当然也可以直接改成debug自带的相关函数，如下debug.traceback：<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">local</span> f, res = <span class="built_in">xpcall</span>(<span class="function"><span class="keyword">function</span> <span class="params">()</span></span></span><br><span class="line">    <span class="keyword">return</span> sum(<span class="number">10</span>, <span class="number">20</span>, <span class="string">"a"</span>)</span><br><span class="line"><span class="keyword">end</span> , <span class="built_in">debug</span>.<span class="built_in">traceback</span>)</span><br><span class="line"><span class="built_in">print</span>(f, res)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- output:</span></span><br><span class="line"><span class="literal">false</span>   src/pcall_test.lua:<span class="number">12</span>: attempt to perform arithmetic on <span class="keyword">local</span> <span class="string">'c'</span> (a <span class="built_in">string</span> value)</span><br><span class="line">stack <span class="built_in">traceback</span>:</span><br><span class="line">        src/pcall_test.lua:<span class="number">12</span>: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> &lt;<span class="title">src</span>/<span class="title">pcall_test.lua</span>:11&gt;</span></span><br><span class="line"><span class="function">        <span class="params">(...tail calls...)</span></span></span><br><span class="line">        [C]: <span class="keyword">in</span> <span class="function"><span class="keyword">function</span> '<span class="title">xpcall</span>'</span></span><br><span class="line"><span class="function">        <span class="title">src</span>/<span class="title">pcall_test.lua</span>:41: <span class="title">in</span> <span class="title">main</span> <span class="title">chunk</span></span></span><br><span class="line"><span class="function">        [<span class="title">C</span>]: <span class="title">in</span> ?</span></span><br></pre></td></tr></table></figure></p>
-
-      
-    </div>
-
-    <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjktweozg000aj94gzjuhw36l" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li></ul>
-
-    </footer>
-  </div>
-
-<div id="disqus_thread"></div>
-<script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-  
-</article>
-
-
-
-  
-    <article id="post-some-tips-about-openresty-lua" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/12/some-tips-about-openresty-lua/" class="article-date">
-  <time datetime="2018-04-12T03:34:24.000Z" itemprop="datePublished">2018-04-12</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/12/some-tips-about-openresty-lua/">关于openresty lua使用的一些tips</a>
-    </h1>
-  
-
-	<br/>
-        <div>
-	<span id="busuanzi_container_page_pv" style='display:none'>
-	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
-	</span>
-	</div>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <ol>
-<li><p>nginx 是多 worker 进程的模型，所以除了共享内存字典是所有 worker 进程共享之外，其他的数据都是每 worker 一份的，无论是在 init_by_lua 里面创建的全局变量，还是 Lua 模块里的状态变量。 </p>
-</li>
-<li><p>在某个请求里面更新某个 Lua 变量，只是更新了当前处理这个请求的 nginx worker 进程里的状态，并不会影响其他的 worker 进程（除非只配置了一个 nginx worker）。 </p>
-</li>
-<li><p>Lua VM 是每一个 nginx worker 进程一份。这些独立的 Lua VM 副本是从 nginx master 进程的 Lua VM 给 fork 出来的。而 init_by_lua 运行在 master 进程的 Lua VM 中，时间点发生在进程 fork 之前。 </p>
-</li>
-<li><p>在共享内存字典中保存最新的数据，每个 worker 进程里通过 Lua 模块变量或者 init_by_lua 创建的全局变量<code>追踪</code>当前 worker 里实际使用的数据(worker需要不断同共享内存的数据进行比较并更新)。</p>
-</li>
-<li><p>关于上述1、2、3、4点，更多请参考: </p>
-<ul>
-<li><a href="https://groups.google.com/forum/#!msg/openresty/N1GJZyaClkM/4xoNQO1MDhQJ" target="_blank" rel="noopener">google group-init_by_lua中全局变量的用法</a></li>
-<li><a href="https://groups.google.com/forum/#!topic/openresty/xd_33CSvU_o" target="_blank" rel="noopener">google group-worker内多个请求共享全局变量</a></li>
-</ul>
-</li>
-<li><p>lua_code_cache的使用</p>
-<ul>
-<li>关闭lua_code_cache, 则每一个请求都由一个独立的lua VM来处理。因此，通过A请求变更的lua数据(如模块变量)，不会被B请求解析到，即使只配置了一个。</li>
-<li>关闭lua_code_cache的好处，对于纯lua文件(不涉及nginx解析的),在不重启nginx的情况下也能立即生效。</li>
-<li>启用lua_code_cache, 则同一个worker的所有请求共享一个lua VM的数据。因此，由该worker处理的A请求变更了lua数据(如模块变量)，则会被同一个worker处理的B请求访问到。  </li>
-<li>生产环境强烈建议启用lua_code_cache,否则会带来较大的性能损失。</li>
-<li>更多参考 <a href="https://github.com/openresty/lua-nginx-module#lua_code_cache" target="_blank" rel="noopener">这里</a></li>
-</ul>
-</li>
-<li><p>关于lua变量共享问题</p>
-<ul>
-<li>尽量不使用全局变量</li>
-<li>如果要使用，使用模块变量</li>
-<li>如果模块变量无法满足，使用共享内存或者分布式缓存</li>
-<li>更多参考 <a href="https://github.com/openresty/lua-nginx-module#lua-variable-scope" target="_blank" rel="noopener">lua-variable-scope</a>、<a href="https://moonbingbing.gitbooks.io/openresty-best-practices/ngx_lua/lua-variable-scope.html" target="_blank" rel="noopener">变量的共享范围</a></li>
-<li><a href="https://github.com/openresty/lua-nginx-module#data-sharing-within-an-nginx-worker" target="_blank" rel="noopener">Data Sharing within an Nginx Worker</a></li>
-<li><a href="https://idndx.com/2018/01/19/data-sharing-in-openresty/" target="_blank" rel="noopener">data-sharing-in-openresty</a></li>
-</ul>
-</li>
-<li><p>不应使用模块级的局部变量以及模块属性，存放任何请求级的数据。否则在 luacodecache 开启时，会造成请求间相互影响和数据竞争，产生不可预知的异常状况。</p>
-<ul>
-<li><a href="http://lua.ren/topic/135/%E5%85%B3%E4%BA%8E-openresty-%E7%9A%84%E4%B8%A4%E4%B8%89%E4%BA%8B" target="_blank" rel="noopener">关于 OPENRESTY 的两三事</a></li>
-</ul>
-</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">关于变量共享的一个最小化配置:</span><br><span class="line">-- share.lua</span><br><span class="line">local _M=&#123;&#125;</span><br><span class="line">local data = &#123;&#125;</span><br><span class="line"></span><br><span class="line">function _M.get_value(key)</span><br><span class="line">    return data[key]</span><br><span class="line">end</span><br><span class="line">function _M.set_value(key,value)</span><br><span class="line">    data[key] = value</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">return _M</span><br><span class="line"></span><br><span class="line">### server.conf</span><br><span class="line">server &#123;</span><br><span class="line">    listen 8081;</span><br><span class="line">    server_name 127.0.0.1;</span><br><span class="line"></span><br><span class="line">    ### 通过请求A设置模块共享变量</span><br><span class="line">    location = /1 &#123;</span><br><span class="line">        content_by_lua_block &#123;</span><br><span class="line">            local share = require(&apos;share&apos;)</span><br><span class="line">            share.set_value(&apos;a&apos;,&apos;b&apos;)</span><br><span class="line">            ngx.say(share.get_value(&apos;a&apos;))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ### 通过请求B读取共享变量</span><br><span class="line">    location = /2 &#123;</span><br><span class="line">        content_by_lua_block &#123;</span><br><span class="line">            local share = require(&apos;share&apos;)</span><br><span class="line">            ngx.say(share.get_value(&apos;a&apos;))</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-- init.lua</span><br><span class="line">package.path = &quot;/usr/local/Cellar/openresty/1.13.6.1/lualib/?.lua;/usr/local/etc/openresty/lua/?.lua;;&quot;;</span><br><span class="line"></span><br><span class="line">### nginx 主配置文件部分内容</span><br><span class="line">http &#123;</span><br><span class="line">    include       mime.types;</span><br><span class="line">    default_type  application/octet-stream;</span><br><span class="line"></span><br><span class="line">    log_format main &apos;$remote_addr - [$time_local] &quot;$request&quot; $status &apos;</span><br><span class="line">    &apos; &quot;$http_referer&quot; &quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot; &apos;;</span><br><span class="line"></span><br><span class="line">    access_log  logs/access.log  main;</span><br><span class="line">    sendfile        on;</span><br><span class="line">    keepalive_timeout  60;</span><br><span class="line">    include server.conf;</span><br><span class="line">    lua_code_cache on;</span><br><span class="line">    init_by_lua_file lua/init.lua;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjktweozp000jj94g3ri2w5h8" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
 
     </footer>
   </div>
@@ -972,7 +950,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Charles/">Charles</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NGINX/">NGINX</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Netty/">Netty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serialization/">Serialization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unicode/">Unicode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Charles/">Charles</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Git/">Git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Lua/">Lua</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Maven/">Maven</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NGINX/">NGINX</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Netty/">Netty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OpenResty/">OpenResty</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SLF4J/">SLF4J</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SQL/">SQL</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Serialization/">Serialization</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring/">Spring</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Springboot/">Springboot</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unicode/">Unicode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/other/">other</a></li></ul>
     </div>
   </div>
 
@@ -982,7 +960,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
@@ -991,7 +969,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">三月 2018</a></li></ul>
     </div>
   </div>
 
@@ -1004,6 +982,14 @@
       <ul>
         
           <li>
+            <a href="/2018/09/27/enum-compatibility-issue/">Thrift枚举对象兼容性问题</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/22/a-high-coupling-case/">一个内部API高度耦合的Java实现案例</a>
+          </li>
+        
+          <li>
             <a href="/2018/08/15/netty-version-conflicting-exception/">Netty版本冲突引起Cassandra访问异常</a>
           </li>
         
@@ -1013,14 +999,6 @@
         
           <li>
             <a href="/2018/06/05/https-package-capture-by-charles/">使用charles抓取iOS数据包</a>
-          </li>
-        
-          <li>
-            <a href="/2018/06/05/java-unused-import-statment/">Java import 失效</a>
-          </li>
-        
-          <li>
-            <a href="/2018/05/10/zero-width-space/">看不见的字符-&lt;200b&gt;</a>
           </li>
         
       </ul>
