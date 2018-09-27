@@ -64,6 +64,80 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-sql-with-null" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/26/sql-with-null/" class="article-date">
+  <time datetime="2018-04-26T11:22:16.000Z" itemprop="datePublished">2018-04-26</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/26/sql-with-null/">SQL语句中的NULL判断</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>今天在写SQL过滤条件时，有个URL判空逻辑，想当然的写成了如下格式:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> != <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
+<p>然而，明明有符合条件的数据，但查询结果并没有出现。问题在哪呢？<br>检索了一下，发现SQL语句中针对NULL的处理逻辑有些特殊。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NULL表示一个未知的值，不能与任何类型的数据进行比较。如果进行了比较，则比较结果依然是NULL，而不是True或者False。</span><br></pre></td></tr></table></figure>
+<p>那如何判断呢？答案是，使用is NULL 或者 is not  NULL。<br>上面的SQL语句改成如下即可。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
+<p>MySQL手册还给了几个比较典型的case，有助于进一步理解:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT 1 IS NULL, 1 IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">| 1 IS NULL | 1 IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">|         0 |             1 |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 = NULL, 1 &lt;&gt; NULL, 1 &lt; NULL, 1 &gt; NULL;</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">| 1 = NULL | 1 &lt;&gt; NULL | 1 &lt; NULL | 1 &gt; NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">|     NULL |      NULL |     NULL |     NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 0 IS NULL, 0 IS NOT NULL, '' IS NULL, '' IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">| 0 IS NULL | 0 IS NOT NULL | '' IS NULL | '' IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">|         0 |             1 |          0 |              1 |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br></pre></td></tr></table></figure></p>
+<p>完整说明请参考<a href="https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html" target="_blank" rel="noopener">MySQL手册-Working with NULL Values</a>。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjmkqpbag001dyr4g3uf3i2vr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-lua-pcall-and-xpcall" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/04/14/lua-pcall-and-xpcall/" class="article-date">
@@ -106,7 +180,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjmkpl7e4000bt54gebs49nks" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/14/lua-pcall-and-xpcall/" data-id="cjmkqpb9l000dyr4gtgk9nvp9" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li></ul>
@@ -215,7 +289,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjmkpl7ef000qt54gl4iwfj41" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/12/some-tips-about-openresty-lua/" data-id="cjmkqpbae0019yr4gzpt224nq" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Lua/">Lua</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/OpenResty/">OpenResty</a></li></ul>
@@ -293,7 +367,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjmkpl7dy0003t54gdeyel2rv" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/08/git-merge-commits-into-one/" data-id="cjmkqpb9d0004yr4gobb67k9k" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Git/">Git</a></li></ul>
@@ -363,7 +437,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjmkpl7ei000ut54ga890yf9d" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/04/07/tools-for-build-a-website/" data-id="cjmkqpbah001eyr4gn8f1pkaj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/other/">other</a></li></ul>
@@ -444,7 +518,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjmkpl7e00004t54g0vpxmeyb" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/20/couchbase-client-2x-compress/" data-id="cjmkqpb940000yr4gujbf862n" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NoSQL/">NoSQL</a></li></ul>
@@ -535,7 +609,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjmkpl7ee000ot54g3r3iyj1d" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/spring-boot-internal-properties-read/" data-id="cjmkqpbaf001ayr4gj8u1fmwe" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Springboot/">Springboot</a></li></ul>
@@ -619,7 +693,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjmkpl7e30008t54gp4k02u2s" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/jd/" data-id="cjmkqpb9j000byr4g842xgkcf" class="article-share-link">Share</a>
       
       
     </footer>
@@ -696,7 +770,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjmkpl7e6000dt54gq2m4b6fq" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/03/11/maven-package-with-version-and-timestamp/" data-id="cjmkqpb9m000gyr4g8u10fxng" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
@@ -759,7 +833,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 15px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
@@ -781,6 +855,10 @@
       <ul>
         
           <li>
+            <a href="/2018/09/27/maven-version-separation/">使用maven version:set分离服务的发布版本</a>
+          </li>
+        
+          <li>
             <a href="/2018/09/27/enum-compatibility-issue/">Thrift枚举对象兼容性问题</a>
           </li>
         
@@ -794,10 +872,6 @@
         
           <li>
             <a href="/2018/08/13/rmi-deserialization-vulnerability/">RMI反序列化漏洞</a>
-          </li>
-        
-          <li>
-            <a href="/2018/06/05/https-package-capture-by-charles/">使用charles抓取iOS数据包</a>
           </li>
         
       </ul>

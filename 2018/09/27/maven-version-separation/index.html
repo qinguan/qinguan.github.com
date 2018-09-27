@@ -5,20 +5,20 @@
   
 
   
-  <title>Netty版本冲突引起Cassandra访问异常 | QINGUAN</title>
+  <title>使用maven version:set分离服务的发布版本 | QINGUAN</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
-<meta name="keywords" content="Java,Netty">
+  <meta name="description" content="开发过程中需要分离测试环境依赖和线上环境依赖。 举个简单的例子，有个依赖包hexo-api，在正式环境中是version=hexo-api-1.0，测试环境中是version=hexo-api-1.0-SNAPSHOT。 但实际项目中pom.xml是这样配的，如:1234567...&amp;lt;groupId&amp;gt;com.qinguan&amp;lt;/groupId&amp;gt;&amp;lt;artifactId&amp;g">
+<meta name="keywords" content="Java,Maven">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Netty版本冲突引起Cassandra访问异常">
-<meta property="og:url" content="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/index.html">
+<meta property="og:title" content="使用maven version:set分离服务的发布版本">
+<meta property="og:url" content="http://qinguan.github.io/2018/09/27/maven-version-separation/index.html">
 <meta property="og:site_name" content="QINGUAN">
-<meta property="og:description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
+<meta property="og:description" content="开发过程中需要分离测试环境依赖和线上环境依赖。 举个简单的例子，有个依赖包hexo-api，在正式环境中是version=hexo-api-1.0，测试环境中是version=hexo-api-1.0-SNAPSHOT。 但实际项目中pom.xml是这样配的，如:1234567...&amp;lt;groupId&amp;gt;com.qinguan&amp;lt;/groupId&amp;gt;&amp;lt;artifactId&amp;g">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-08-14T16:08:29.000Z">
+<meta property="og:updated_time" content="2018-09-27T15:39:39.298Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Netty版本冲突引起Cassandra访问异常">
-<meta name="twitter:description" content="Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：123java.lang.AbstractMethodError: io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/">
+<meta name="twitter:title" content="使用maven version:set分离服务的发布版本">
+<meta name="twitter:description" content="开发过程中需要分离测试环境依赖和线上环境依赖。 举个简单的例子，有个依赖包hexo-api，在正式环境中是version=hexo-api-1.0，测试环境中是version=hexo-api-1.0-SNAPSHOT。 但实际项目中pom.xml是这样配的，如:1234567...&amp;lt;groupId&amp;gt;com.qinguan&amp;lt;/groupId&amp;gt;&amp;lt;artifactId&amp;g">
   
     <link rel="alternate" href="/atom.xml" title="QINGUAN" type="application/atom+xml">
   
@@ -67,10 +67,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-netty-version-conflicting-exception" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-maven-version-separation" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/08/15/netty-version-conflicting-exception/" class="article-date">
-  <time datetime="2018-08-14T16:02:02.000Z" itemprop="datePublished">2018-08-15</time>
+    <a href="/2018/09/27/maven-version-separation/" class="article-date">
+  <time datetime="2018-09-27T15:20:37.000Z" itemprop="datePublished">2018-09-27</time>
 </a>
     
   </div>
@@ -81,7 +81,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Netty版本冲突引起Cassandra访问异常
+      使用maven version:set分离服务的发布版本
     </h1>
   
 
@@ -95,17 +95,23 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Java RPC服务单元测试访问Cassandra时，发现始终报如下错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">java.lang.AbstractMethodError: </span><br><span class="line">io.netty.util.concurrent.MultithreadEventExecutorGroup.newChild(Ljava/util/</span><br><span class="line">    concurrent/Executor;[Ljava/lang/Object;)Lio/netty/util/concurrent/EventExecutor</span><br></pre></td></tr></table></figure></p>
-<p>排查了一圈，最终发现是Netty引起的。<br>Java RPC服务依赖的是Netty3.X版本，Cassandra驱动测试包依赖的是Netty4.X版本，将Netty版本调整成一致解决。</p>
+        <p>开发过程中需要分离测试环境依赖和线上环境依赖。</p>
+<p>举个简单的例子，有个依赖包hexo-api，在正式环境中是version=hexo-api-1.0，测试环境中是version=hexo-api-1.0-SNAPSHOT。</p>
+<p>但实际项目中pom.xml是这样配的，如:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.qinguan<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hexo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>hexo-api<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>我不想因为发布一个测试版本1.0-SNAPSHOT的jar而去提交一个如下的变更。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>那怎么办呢？可以试试<a href="https://www.mojohaus.org/versions-maven-plugin/index.html" target="_blank" rel="noopener">maven-version-plugin</a>。</p>
+<p>具体用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假定之前打包命令</span></span><br><span class="line">clean compile -Papi deploy </span><br><span class="line"></span><br><span class="line"><span class="comment">//测试包打包命令</span></span><br><span class="line">clean versions:set -DnewVersion=<span class="number">1.0</span>-SNAPSHOT compile -Papi deploy</span><br></pre></td></tr></table></figure></p>
+<p>通过<a href="https://www.mojohaus.org/versions-maven-plugin/set-mojo.html" target="_blank" rel="noopener">versions:set</a>更改pom.xml中的version值，newVersion参数为目标版本号。</p>
+<p>此时打开pom.xml，可以看到文件中的version值已由1.0更新为1.0-SNAPSHOT了，jar包也变成了hexo-api-1.0-SNAPSHOT.jar。</p>
 
       
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjmkqpb9p000hyr4gpng29ztm" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/09/27/maven-version-separation/" data-id="cjmkqpb9h0008yr4gujvzl6a0" class="article-share-link">Share</a>
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Netty/">Netty</a></li></ul>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
 
     </footer>
   </div>
@@ -135,19 +141,10 @@
     
 <nav id="article-nav">
   
-    <a href="/2018/08/22/a-high-coupling-case/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Newer</strong>
-      <div class="article-nav-title">
-        
-          一个内部API高度耦合的Java实现案例
-        
-      </div>
-    </a>
   
-  
-    <a href="/2018/08/13/rmi-deserialization-vulnerability/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2018/09/27/enum-compatibility-issue/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">RMI反序列化漏洞</div>
+      <div class="article-nav-title">Thrift枚举对象兼容性问题</div>
     </a>
   
 </nav>

@@ -64,6 +64,82 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-maven-version-separation" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/09/27/maven-version-separation/" class="article-date">
+  <time datetime="2018-09-27T15:20:37.000Z" itemprop="datePublished">2018-09-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/09/27/maven-version-separation/">使用maven version:set分离服务的发布版本</a>
+    </h1>
+  
+
+	<br/>
+        <div>
+	<span id="busuanzi_container_page_pv" style='display:none'>
+	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
+	</span>
+	</div>
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>开发过程中需要分离测试环境依赖和线上环境依赖。</p>
+<p>举个简单的例子，有个依赖包hexo-api，在正式环境中是version=hexo-api-1.0，测试环境中是version=hexo-api-1.0-SNAPSHOT。</p>
+<p>但实际项目中pom.xml是这样配的，如:<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.qinguan<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>hexo<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">name</span>&gt;</span>hexo-api<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>我不想因为发布一个测试版本1.0-SNAPSHOT的jar而去提交一个如下的变更。<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>那怎么办呢？可以试试<a href="https://www.mojohaus.org/versions-maven-plugin/index.html" target="_blank" rel="noopener">maven-version-plugin</a>。</p>
+<p>具体用法:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//假定之前打包命令</span></span><br><span class="line">clean compile -Papi deploy </span><br><span class="line"></span><br><span class="line"><span class="comment">//测试包打包命令</span></span><br><span class="line">clean versions:set -DnewVersion=<span class="number">1.0</span>-SNAPSHOT compile -Papi deploy</span><br></pre></td></tr></table></figure></p>
+<p>通过<a href="https://www.mojohaus.org/versions-maven-plugin/set-mojo.html" target="_blank" rel="noopener">versions:set</a>更改pom.xml中的version值，newVersion参数为目标版本号。</p>
+<p>此时打开pom.xml，可以看到文件中的version值已由1.0更新为1.0-SNAPSHOT了，jar包也变成了hexo-api-1.0-SNAPSHOT.jar。</p>
+
+      
+    </div>
+
+    <footer class="article-footer">
+      <a data-url="http://qinguan.github.io/2018/09/27/maven-version-separation/" data-id="cjmkqpb9h0008yr4gujvzl6a0" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Maven/">Maven</a></li></ul>
+
+    </footer>
+  </div>
+
+<div id="disqus_thread"></div>
+<script>
+        /**
+        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+        /*
+        var disqus_config = function () {
+        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+        */
+        (function() { // DON'T EDIT BELOW THIS LINE
+        var d = document, s = d.createElement('script');
+        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+
+  
+</article>
+
+
+
+  
     <article id="post-enum-compatibility-issue" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2018/09/27/enum-compatibility-issue/" class="article-date">
@@ -116,7 +192,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/09/27/enum-compatibility-issue/" data-id="cjmkpl7dv0001t54g0y3heyxe" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/09/27/enum-compatibility-issue/" data-id="cjmkqpb9c0003yr4gws31sh8h" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RPC/">RPC</a></li></ul>
@@ -193,7 +269,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/22/a-high-coupling-case/" data-id="cjmkpl7dr0000t54gy809sz5r" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/08/22/a-high-coupling-case/" data-id="cjmkqpb980001yr4g9vaiuo4l" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li></ul>
@@ -263,7 +339,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjmkpl7ea000ht54gh05guuzl" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/08/15/netty-version-conflicting-exception/" data-id="cjmkqpb9p000hyr4gpng29ztm" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Netty/">Netty</a></li></ul>
@@ -340,7 +416,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/08/13/rmi-deserialization-vulnerability/" data-id="cjmkpl7e8000gt54g4pyaoicc" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/08/13/rmi-deserialization-vulnerability/" data-id="cjmkqpbaa0015yr4g2tdkz4uj" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Serialization/">Serialization</a></li></ul>
@@ -434,7 +510,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cjmkpl7e00005t54gnngzg4aj" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/https-package-capture-by-charles/" data-id="cjmkqpb9f0005yr4gux2jk4hh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Charles/">Charles</a></li></ul>
@@ -504,7 +580,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cjmkpl7e20007t54grroytr73" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/06/05/java-unused-import-statment/" data-id="cjmkqpb9g0007yr4gz8gsgq50" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
@@ -584,7 +660,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjmkpl7ej000wt54g3qd535mn" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/10/zero-width-space/" data-id="cjmkqpbaj001gyr4gqbru0o51" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Unicode/">Unicode</a></li></ul>
@@ -662,7 +738,7 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjmkpl7eb000jt54g3xec3c5o" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/08/nginx-resolver-vaild-and-timeout/" data-id="cjmkqpba80013yr4go6hfog94" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NGINX/">NGINX</a></li></ul>
@@ -823,84 +899,10 @@
     </div>
 
     <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjmkpl7ed000lt54ggnx358bq" class="article-share-link">Share</a>
+      <a data-url="http://qinguan.github.io/2018/05/04/slf4j-stackoverflowerror/" data-id="cjmkqpbac0018yr4geqfbzo7o" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SLF4J/">SLF4J</a></li></ul>
-
-    </footer>
-  </div>
-
-<div id="disqus_thread"></div>
-<script>
-        /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-        /*
-        var disqus_config = function () {
-        this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-        };
-        */
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = 'https://qinguan-github-io.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-
-
-  
-</article>
-
-
-
-  
-    <article id="post-sql-with-null" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2018/04/26/sql-with-null/" class="article-date">
-  <time datetime="2018-04-26T11:22:16.000Z" itemprop="datePublished">2018-04-26</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2018/04/26/sql-with-null/">SQL语句中的NULL判断</a>
-    </h1>
-  
-
-	<br/>
-        <div>
-	<span id="busuanzi_container_page_pv" style='display:none'>
-	  <!-- 本文总阅读量<span id="busuanzi_value_page_pv"></span>次 -->
-	</span>
-	</div>
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>今天在写SQL过滤条件时，有个URL判空逻辑，想当然的写成了如下格式:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> != <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
-<p>然而，明明有符合条件的数据，但查询结果并没有出现。问题在哪呢？<br>检索了一下，发现SQL语句中针对NULL的处理逻辑有些特殊。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">NULL表示一个未知的值，不能与任何类型的数据进行比较。如果进行了比较，则比较结果依然是NULL，而不是True或者False。</span><br></pre></td></tr></table></figure>
-<p>那如何判断呢？答案是，使用is NULL 或者 is not  NULL。<br>上面的SQL语句改成如下即可。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="built_in">record</span> <span class="keyword">where</span> <span class="keyword">url</span> <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">null</span></span><br></pre></td></tr></table></figure></p>
-<p>MySQL手册还给了几个比较典型的case，有助于进一步理解:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">mysql&gt; SELECT 1 IS NULL, 1 IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">| 1 IS NULL | 1 IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line">|         0 |             1 |</span><br><span class="line">+<span class="comment">-----------+---------------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 1 = NULL, 1 &lt;&gt; NULL, 1 &lt; NULL, 1 &gt; NULL;</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">| 1 = NULL | 1 &lt;&gt; NULL | 1 &lt; NULL | 1 &gt; NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line">|     NULL |      NULL |     NULL |     NULL |</span><br><span class="line">+<span class="comment">----------+-----------+----------+----------+</span></span><br><span class="line"></span><br><span class="line">mysql&gt; SELECT 0 IS NULL, 0 IS NOT NULL, '' IS NULL, '' IS NOT NULL;</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">| 0 IS NULL | 0 IS NOT NULL | '' IS NULL | '' IS NOT NULL |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br><span class="line">|         0 |             1 |          0 |              1 |</span><br><span class="line">+<span class="comment">-----------+---------------+------------+----------------+</span></span><br></pre></td></tr></table></figure></p>
-<p>完整说明请参考<a href="https://dev.mysql.com/doc/refman/8.0/en/working-with-null.html" target="_blank" rel="noopener">MySQL手册-Working with NULL Values</a>。</p>
-
-      
-    </div>
-
-    <footer class="article-footer">
-      <a data-url="http://qinguan.github.io/2018/04/26/sql-with-null/" data-id="cjmkpl7eg000rt54gk0yo36uu" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SQL/">SQL</a></li></ul>
 
     </footer>
   </div>
@@ -960,7 +962,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 10px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
+      <a href="/tags/Charles/" style="font-size: 10px;">Charles</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/Lua/" style="font-size: 15px;">Lua</a> <a href="/tags/Maven/" style="font-size: 15px;">Maven</a> <a href="/tags/NGINX/" style="font-size: 10px;">NGINX</a> <a href="/tags/Netty/" style="font-size: 10px;">Netty</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OpenResty/" style="font-size: 10px;">OpenResty</a> <a href="/tags/RPC/" style="font-size: 10px;">RPC</a> <a href="/tags/SLF4J/" style="font-size: 10px;">SLF4J</a> <a href="/tags/SQL/" style="font-size: 10px;">SQL</a> <a href="/tags/Serialization/" style="font-size: 10px;">Serialization</a> <a href="/tags/Spring/" style="font-size: 10px;">Spring</a> <a href="/tags/Springboot/" style="font-size: 10px;">Springboot</a> <a href="/tags/Unicode/" style="font-size: 10px;">Unicode</a> <a href="/tags/other/" style="font-size: 10px;">other</a>
     </div>
   </div>
 
@@ -982,6 +984,10 @@
       <ul>
         
           <li>
+            <a href="/2018/09/27/maven-version-separation/">使用maven version:set分离服务的发布版本</a>
+          </li>
+        
+          <li>
             <a href="/2018/09/27/enum-compatibility-issue/">Thrift枚举对象兼容性问题</a>
           </li>
         
@@ -995,10 +1001,6 @@
         
           <li>
             <a href="/2018/08/13/rmi-deserialization-vulnerability/">RMI反序列化漏洞</a>
-          </li>
-        
-          <li>
-            <a href="/2018/06/05/https-package-capture-by-charles/">使用charles抓取iOS数据包</a>
           </li>
         
       </ul>
